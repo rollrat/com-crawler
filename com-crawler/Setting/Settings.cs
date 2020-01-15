@@ -25,14 +25,6 @@ namespace com_crawler.Setting
 
         public NetworkSetting NetworkSettings;
 
-        public class PixivSetting
-        {
-            public string Id;
-            public string Password;
-        }
-
-        public PixivSetting PixivSettings;
-
         public AppSettings AppSettings;
 
         /// <summary>
@@ -86,11 +78,6 @@ namespace com_crawler.Setting
                         RetryCount = 10,
                         Proxy = "",
                         UsingProxyList = false
-                    },
-
-                    PixivSettings = new SettingModel.PixivSetting()
-                    {
-                        
                     },
 
                     AppSettings = new AppSettings()
@@ -158,11 +145,6 @@ namespace com_crawler.Setting
                 Model.NetworkSettings.DownloadBufferSize = 131072;
             if (Model.NetworkSettings.RetryCount < 0)
                 Model.NetworkSettings.RetryCount = 10;
-
-            if (Model.PixivSettings == null)
-            {
-                Model.PixivSettings = new SettingModel.PixivSetting();
-            }
 
             if (Model.AppSettings == null)
             {
