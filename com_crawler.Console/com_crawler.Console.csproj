@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\com-crawler\com-crawler.csproj" />
+    <ProjectReference Include="..\com_crawler\com_crawler.csproj" />
   </ItemGroup>
 
 </Project>

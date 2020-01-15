@@ -1,0 +1,9 @@
+﻿<Application x:Class="com_crawler.Tool.CustomCrawler.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:com_crawler.Tool.CustomCrawler"
+             StartupUri="CustomCrawler.xaml">
+    <Application.Resources>
+         
+    </Application.Resources>
+</Application>

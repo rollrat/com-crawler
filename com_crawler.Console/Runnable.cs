@@ -135,7 +135,7 @@ namespace com_crawler.Console
             else
             {
                 System.Console.WriteLine("Nothing to work on.");
-                System.Console.WriteLine("Enter './com-crawler.Console --help' to get more information");
+                System.Console.WriteLine("Enter './com_crawler.Console --help' to get more information");
             }
 
             return;
@@ -146,7 +146,7 @@ namespace com_crawler.Console
             PrintVersion();
             System.Console.WriteLine($"Copyright (C) 2020. Commnunity Crawler Developer");
             System.Console.WriteLine($"E-Mail: rollrat.cse@gmail.com");
-            System.Console.WriteLine($"Source-code: https://github.com/rollrat/com-crawler");
+            System.Console.WriteLine($"Source-code: https://github.com/rollrat/com_crawler");
             System.Console.WriteLine($"");
             System.Console.WriteLine("Usage: ./com_crawler.Console [OPTIONS...] <URL> [URL OPTIONS ...]");
 
@@ -170,7 +170,7 @@ namespace com_crawler.Console
             System.Console.Write(builder.ToString());
 
             System.Console.WriteLine($"");
-            System.Console.WriteLine("Enter './com-crawler.Console --list-extractor' to get more url options.");
+            System.Console.WriteLine("Enter './com_crawler.Console --list-extractor' to get more url options.");
         }
 
         public static void PrintVersion()

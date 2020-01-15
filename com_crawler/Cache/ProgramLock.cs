@@ -11,7 +11,7 @@ namespace com_crawler.Cache
 {
     public class ProgramLock
     {
-        public const string Name = "com-crawler.lock";
+        public const string Name = "com_crawler.lock";
         public static FileStream LockStream;
         public static bool ProgramCrashed = false;
 
