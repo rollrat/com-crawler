@@ -6,6 +6,7 @@
 
 ***/
 
+using com_crawler.Html;
 using HtmlAgilityPack;
 using System;
 using System.Collections.Generic;
@@ -38,7 +39,7 @@ namespace com_crawler.Tool.CustomCrawler
         {
             try
             {
-                //Result.Text = string.Join("\r\n", HtmlCAL.Calculate(Pattern.Text, root_node));
+                Result.Text = string.Join("\r\n", HtmlCAL.Calculate(Pattern.Text, root_node));
             }
             catch (Exception ex)
             {

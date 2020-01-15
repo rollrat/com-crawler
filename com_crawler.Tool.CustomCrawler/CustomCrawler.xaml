@@ -82,7 +82,7 @@
             <Button x:Name="Attributes" Margin="0 4 0 0" Content="Attributes" Click="Attributes_Click"/>
             <Button x:Name="Tree" Margin="0 4 0 0" Content="Tree" Click="Tree_Click"/>
             <Button x:Name="LCATree" Margin="0 4 0 0" Content="LCA Tree" Click="LCATree_Click"/>
-            <Button x:Name="CAL" Margin="0 4 0 0" Content="CAL" Click="CAL_Click" IsEnabled="False"/>
+            <Button x:Name="CAL" Margin="0 4 0 0" Content="CAL" Click="CAL_Click"/>
             <Button x:Name="Manual" Margin="0 4 0 0" Content="Manual" Click="Manual_Click" IsEnabled="False"/>
             <TextBlock Text="Etc" Margin="0 4 0 0"/>
             <CheckBox x:Name="driverCheck" Content="Using driver" IsChecked="False"/>
