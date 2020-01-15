@@ -1,4 +1,4 @@
-# Community Crawler Engine
+# Community Crawling Engine
 
 Community is any form of website where an unspecified number of people can post and share their opinions.
 
