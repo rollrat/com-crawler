@@ -50,12 +50,6 @@ namespace com_crawler.Console
 
         [CommandLine("--disable-download-progress", CommandType.OPTION, Info = "Disable download progress.", Help = "use --disable-download-progress")]
         public bool DisableDownloadProgress;
-
-
-        [CommandLine("--page-start", CommandType.OPTION, Info = "Specify a start page when crawling a multi-page bulletin board.", Help = "use --page-start <Number>")]
-        public string[] PageStart;
-        [CommandLine("--page-end", CommandType.OPTION, Info = "Specify a end page when crawling a multi-page bulletin board.", Help = "use --page-end <Number>")]
-        public string[] PageEnd;
     }
 
     public class Runnable
@@ -201,7 +195,7 @@ namespace com_crawler.Console
                     return;
                 }
             }
-            else
+            else if (extractor != null)
             {
                 try
                 {
