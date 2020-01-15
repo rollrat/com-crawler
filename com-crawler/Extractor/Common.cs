@@ -2,6 +2,10 @@
 // Copyright (C) 2020. rollrat. Licensed under the MIT Licence.
 
 using com_crawler.CL;
+using com_crawler.Extractor.Comic;
+using com_crawler.Extractor.Community;
+using com_crawler.Extractor.Image;
+using com_crawler.Extractor.SNS;
 using com_crawler.Network;
 using com_crawler.Utils;
 using Newtonsoft.Json;
@@ -374,6 +378,23 @@ namespace com_crawler.Extractor
     {
         public static ExtractorModel[] Extractors =
         {
+            new DCInsideExtractor(),
+            new PixivExtractor(),
+            new GelbooruExtractor(),
+            new NaverExtractor(),
+            new EHentaiExtractor(),
+            new HitomiExtractor(),
+            new InstagramExtractor(),
+            new ExHentaiExtractor(),
+            new ManamoaExtractor(),
+            new ImgurExtractor(),
+            new TwitterExtractor(),
+            new HiyobiExtractor(),
+            new DanbooruExtractor(),
+            new FunbeExtractor(),
+            new JmanaExtractor(),
+            new HaneulHaneulExtractor(),
+            new AttrangsExtractor(),
         };
 
         public ExtractorModel GetExtractor(string url)

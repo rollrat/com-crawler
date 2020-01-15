@@ -6,4 +6,8 @@
     <RootNamespace>com_crawler.Console</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\com-crawler\com-crawler.csproj" />
+  </ItemGroup>
+
 </Project>
