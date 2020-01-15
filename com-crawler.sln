@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29411.108
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "com-crawler", "com-crawler\com-crawler.csproj", "{21AA41B6-1F9D-480C-9B06-ACC2ADB2FC16}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "com-crawler", "com-crawler\com-crawler.csproj", "{21AA41B6-1F9D-480C-9B06-ACC2ADB2FC16}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "com-crawler.Console", "com-crawler.Console\com-crawler.Console.csproj", "{5E37AD9C-1C82-4307-AEE5-D76F63693D5F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{21AA41B6-1F9D-480C-9B06-ACC2ADB2FC16}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{21AA41B6-1F9D-480C-9B06-ACC2ADB2FC16}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{21AA41B6-1F9D-480C-9B06-ACC2ADB2FC16}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E37AD9C-1C82-4307-AEE5-D76F63693D5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E37AD9C-1C82-4307-AEE5-D76F63693D5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E37AD9C-1C82-4307-AEE5-D76F63693D5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E37AD9C-1C82-4307-AEE5-D76F63693D5F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
