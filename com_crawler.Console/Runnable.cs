@@ -25,12 +25,11 @@ namespace com_crawler.Console
         public bool Help;
         [CommandLine("--version", CommandType.OPTION, ShortOption = "-v", Info = "Show version information.")]
         public bool Version;
-        [CommandLine("--dialog-mode", CommandType.OPTION, Info = "Run program with dialog mode.")]
-        public bool DialogMode;
-
-        [CommandLine("--net", CommandType.OPTION, Info = "Multi-commands net.", Help = "use --net <Others>")]
-        public bool Net;
-
+        
+        /// <summary>
+        /// Extractor Options
+        /// </summary>
+        
         [CommandLine("--list-extractor", CommandType.OPTION, Info = "Enumerate all implemented extractor.")]
         public bool ListExtractor;
 
@@ -50,6 +49,21 @@ namespace com_crawler.Console
 
         [CommandLine("--disable-download-progress", CommandType.OPTION, Info = "Disable download progress.", Help = "use --disable-download-progress")]
         public bool DisableDownloadProgress;
+
+        [CommandLine("--download-path", CommandType.ARGUMENTS, ArgumentsCount = 1, Info = "Set download path manually.", Help = "use -p")]
+        public string[] DownloadPath;
+
+        /// <summary>
+        /// Component Options
+        /// </summary>
+
+        [CommandLine("--build-component", CommandType.OPTION, Info = "Build component for fast querying.")]
+        public bool BuildComponent;
+
+        /// <summary>
+        /// Bot Options
+        /// </summary>
+
     }
 
     public class Runnable
@@ -117,7 +131,7 @@ namespace com_crawler.Console
 
                 weird.ForEach(x => n_args.Add(arguments[x]));
 
-                ProcessExtract(option.Url[0], n_args.ToArray(), option.PathFormat, option.ExtractInformation, option.ExtractLinks, option.PrintProcess, option.DisableDownloadProgress);
+                ProcessExtract(option.Url[0], n_args.ToArray(), option.PathFormat, option.ExtractInformation, option.ExtractLinks, option.PrintProcess, option.DisableDownloadProgress, option.DownloadPath);
             }
             else if (option.Error)
             {
@@ -172,7 +186,7 @@ namespace com_crawler.Console
             System.Console.WriteLine($"{Version.Name} {Version.Text}");
         }
 
-        static void ProcessExtract(string url, string[] args, string[] PathFormat, bool ExtractInformation, bool ExtractLinks, bool PrintProcess, bool DisableDownloadProgress)
+        static void ProcessExtract(string url, string[] args, string[] PathFormat, bool ExtractInformation, bool ExtractLinks, bool PrintProcess, bool DisableDownloadProgress, string[] DownloadPath)
         {
             var extractor = ExtractorManager.Instance.GetExtractor(url);
 
@@ -324,8 +338,12 @@ namespace com_crawler.Console
                         pb = new ProgressBar();
                     }
 
+                    var downloadpath = Settings.Instance.Model.SuperPath;
+                    if (DownloadPath.Length > 0)
+                        downloadpath = DownloadPath[0];
+
                     tasks.Item1.ForEach(task => {
-                        task.Filename = Path.Combine(Settings.Instance.Model.SuperPath, task.Format.Formatting(format));
+                        task.Filename = Path.Combine(downloadpath, task.Format.Formatting(format));
                         if (!Directory.Exists(Path.GetDirectoryName(task.Filename)))
                             Directory.CreateDirectory(Path.GetDirectoryName(task.Filename));
                         if (!PrintProcess && !DisableDownloadProgress)
