@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace com_crawler.Network
+namespace com_crawler.Proxy
 {
     public class ProxyList : ILazy<ProxyList>
     {

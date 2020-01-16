@@ -3,6 +3,7 @@
 
 using com_crawler.Extractor;
 using com_crawler.Postprocessor;
+using com_crawler.Proxy;
 using com_crawler.Setting;
 using Newtonsoft.Json;
 using System;
