@@ -48,7 +48,7 @@ namespace com_crawler.Component
         public HashSet<InclinationType> Types;
     }
 
-    public abstract class CommunitySitemapBoard
+    public class CommunitySitemapBoard
     {
         public int Index;
         public int Category;
@@ -57,7 +57,7 @@ namespace com_crawler.Component
         public string Id;
         public string Description;
         public CommunityInclination Inclination;
-        public abstract string MakeURL();
+        public virtual string MakeURL() { throw new NotImplementedException(); }
     }
 
     public class CommunitySitemapCategory
@@ -76,7 +76,7 @@ namespace com_crawler.Component
         public List<int> Links;
     }
 
-    public abstract class CommunityArticle
+    public class CommunityArticle
     {
         /// <summary>
         /// Hashed Identification
@@ -100,7 +100,7 @@ namespace com_crawler.Component
 
         public string Body;
 
-        public abstract string MakeURL();
+        public virtual string MakeURL() { throw new NotImplementedException(); }
     }
 
     public class CommunityBoard
