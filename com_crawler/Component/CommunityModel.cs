@@ -7,45 +7,40 @@ using System.Text;
 
 namespace com_crawler.Component
 {
-    public class CommunityInclination
+    public enum CommunityInclinationType
     {
-        public enum InclinationType
-        {
-            Complex, // Default
+        Complex, // Default
 
-            // Keyword
-            Professional,
-            Anonymity,
+        // Keyword
+        Professional,
+        Anonymity,
 
-            // Scholarship
-            Politics,
-            Economy,
-            Programming,
+        // Scholarship
+        Politics,
+        Economy,
+        Programming,
 
-            // Organism
-            Cat,
-            Dog,
-            Plant,
-            Universe,
+        // Organism
+        Cat,
+        Dog,
+        Plant,
+        Universe,
 
-            // Hobby
-            Life,
-            Game,
-            Humor,
-            IDOL,
-            Song,
+        // Hobby
+        Life,
+        Game,
+        Humor,
+        IDOL,
+        Song,
 
-            // Motors
-            Car,
-            Motorcycle,
+        // Motors
+        Car,
+        Motorcycle,
 
-            // Device
-            Smartphone,
-            Computer,
-            Watch,
-        }
-
-        public HashSet<InclinationType> Types;
+        // Device
+        Smartphone,
+        Computer,
+        Watch,
     }
 
     public class CommunitySitemapBoard
@@ -56,7 +51,7 @@ namespace com_crawler.Component
         public string Name;
         public string Id;
         public string Description;
-        public CommunityInclination Inclination;
+        public HashSet<CommunityInclinationType> Inclination;
         public virtual string MakeURL() { throw new NotImplementedException(); }
     }
 
@@ -126,7 +121,7 @@ namespace com_crawler.Component
         /// </summary>
         public bool IsCreatableAccount;
 
-        public CommunityInclination Inclination;
+        public HashSet<CommunityInclinationType> Inclination;
 
         public CommunitySitemap Sitemap;
 
@@ -146,6 +141,6 @@ namespace com_crawler.Component
             Type = ComponentType.CommunitySite;
         }
 
-
+        public abstract void BuildSitemap();
     }
 }
