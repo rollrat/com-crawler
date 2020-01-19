@@ -35,6 +35,8 @@ namespace com_crawler.Setting
 
         public AppSettings AppSettings;
 
+        public DataBaseSettings DataBaseSettings;
+
         /// <summary>
         /// Scheduler Thread Count
         /// </summary>
@@ -97,6 +99,12 @@ namespace com_crawler.Setting
                     {
                         SaveThumbnailOnLocalStorage = true,
                         DownloadWithMetadata = false,
+                    },
+
+                    DataBaseSettings = new DataBaseSettings()
+                    {
+                        DataBaseServer = DataBaseServer.MySQL,
+                        ConnectionString = "",
                     },
                 };
             }
@@ -170,6 +178,15 @@ namespace com_crawler.Setting
                 {
                     SaveThumbnailOnLocalStorage = true,
                     DownloadWithMetadata = false,
+                };
+            }
+
+            if (Model.DataBaseSettings == null)
+            {
+                Model.DataBaseSettings = new DataBaseSettings
+                {
+                    DataBaseServer = DataBaseServer.MySQL,
+                    ConnectionString = "",
                 };
             }
         }
