@@ -11,7 +11,7 @@ namespace com_crawler
     {
         public const int MajorVersion = 2020;
         public const int MinorVersion = 01;
-        public const int BuildVersion = 15;
+        public const int BuildVersion = 19;
 
         public const string Name = "Community Crawler";
         public static string Text { get; } = $"{MajorVersion}.{MinorVersion}.{BuildVersion}";
