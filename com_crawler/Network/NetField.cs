@@ -29,6 +29,9 @@ namespace com_crawler.Network
                 return;
             }
 
+            NetTaskPass.RunOnField(ref content);
+
+            interrupt.WaitOne();
             if (content.DownloadString)
                 Log.Logs.Instance.Push("[NetField] Start download string... " + content.Url);
             else if (content.MemoryCache)

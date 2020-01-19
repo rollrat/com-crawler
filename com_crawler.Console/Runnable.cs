@@ -7,6 +7,7 @@ using com_crawler.Crypto;
 using com_crawler.Extractor;
 using com_crawler.Log;
 using com_crawler.Network;
+using com_crawler.Proxy;
 using com_crawler.Setting;
 using System;
 using System.Collections.Generic;
@@ -25,11 +26,18 @@ namespace com_crawler.Console
         public bool Help;
         [CommandLine("--version", CommandType.OPTION, ShortOption = "-v", Info = "Show version information.")]
         public bool Version;
-        
+
+        /// <summary>
+        /// Atomic Options
+        /// </summary>
+
+        [CommandLine("--build-free-proxy", CommandType.OPTION, Info = "Build free proxy list.")]
+        public bool BuildFreeProxy;
+
         /// <summary>
         /// Extractor Options
         /// </summary>
-        
+
         [CommandLine("--list-extractor", CommandType.OPTION, Info = "Enumerate all implemented extractor.")]
         public bool ListExtractor;
 
@@ -85,6 +93,10 @@ namespace com_crawler.Console
             else if (option.Version)
             {
                 PrintVersion();
+            }
+            else if (option.BuildFreeProxy)
+            {
+                FreeProxy.Instance.Build();
             }
             else if (option.ListExtractor)
             {
@@ -339,7 +351,7 @@ namespace com_crawler.Console
                     }
 
                     var downloadpath = Settings.Instance.Model.SuperPath;
-                    if (DownloadPath.Length > 0)
+                    if (DownloadPath != null && DownloadPath.Length > 0)
                         downloadpath = DownloadPath[0];
 
                     tasks.Item1.ForEach(task => {

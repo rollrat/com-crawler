@@ -5,6 +5,7 @@ using com_crawler.Cache;
 using com_crawler.Log;
 using com_crawler.Network;
 using com_crawler.Postprocessor;
+using com_crawler.Proxy;
 using com_crawler.Setting;
 using com_crawler.Utils;
 using System;
@@ -73,6 +74,19 @@ namespace com_crawler
             Logs.Instance.Push("App provider starts.");
 
             GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
+
+            if (Settings.Instance.Network.UsingFreeProxy && FreeProxy.Instance.IsBuildRequire())
+            {
+                if (FreeProxy.Instance.IsBuildRequire())
+                {
+                    Logs.Instance.Push("You must build proxy to use free-proxy. Please run with --build-free-proxy before using free-proxy.");
+                }
+                else
+                {
+                    FreeProxy.Instance.Load();
+                }
+                FreeProxyPass.Init();
+            }
 
             Initialized = true;
 

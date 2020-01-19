@@ -21,6 +21,7 @@ namespace com_crawler.Setting
             public int RetryCount;
             public string Proxy;
             public bool UsingProxyList;
+            public bool UsingFreeProxy;
         }
 
         public NetworkSetting NetworkSettings;
@@ -87,7 +88,8 @@ namespace com_crawler.Setting
                         DownloadBufferSize = 131072,
                         RetryCount = 10,
                         Proxy = "",
-                        UsingProxyList = false
+                        UsingProxyList = false,
+                        UsingFreeProxy = false,
                     },
 
                     PixivSettings = new SettingModel.PixivSetting()
@@ -156,7 +158,8 @@ namespace com_crawler.Setting
                     DownloadBufferSize = 131072,
                     RetryCount = 10,
                     Proxy = "",
-                    UsingProxyList = false
+                    UsingProxyList = false,
+                    UsingFreeProxy = false,
                 };
             }
 
