@@ -9,6 +9,39 @@ namespace com_crawler.Component.Community
 {
     internal sealed class DefaultComponent : CommunityModel
     {
+        #region Initialize context
+
+        public DefaultComponent(int index) : base()
+        {
+            Context = new CommunityContext
+            {
+                Index = index,
+
+                Name = "",
+                URL = "",
+                Description = "",
+
+                IsMobileOnly = false,
+                IsLoginable = true,
+                IsCreatableAccount = true,
+
+                Inclination = new HashSet<CommunityInclinationType>(),
+
+                Sitemap = null,
+
+                CategoryMap = new List<CommunitySitemapCategory>(),
+                BoardMap = new List<CommunitySitemapBoard>(),
+
+                Board = new List<CommunityBoard>(),
+                Article = new List<CommunityArticle>(),
+                Comment = new List<CommunityComment>(),
+
+                LoginInfo = new List<CommunityLoginInfo>(),
+            };
+        }
+
+        #endregion
+
         #region Build Site Map
 
         public override void BuildSitemap()
