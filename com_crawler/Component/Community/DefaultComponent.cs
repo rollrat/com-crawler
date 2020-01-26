@@ -18,7 +18,7 @@ namespace com_crawler.Component.Community
                 Index = index,
 
                 Name = "",
-                URL = "",
+                Host = "",
                 Description = "",
 
                 IsMobileOnly = false,
@@ -27,16 +27,16 @@ namespace com_crawler.Component.Community
 
                 Inclination = new HashSet<CommunityInclinationType>(),
 
-                Sitemap = null,
+                Sitemap = -1,
 
-                CategoryMap = new List<CommunitySitemapCategory>(),
-                BoardMap = new List<CommunitySitemapBoard>(),
+                CategoryMap = null,
+                BoardMap = null,
 
-                Board = new List<CommunityBoard>(),
-                Article = new List<CommunityArticle>(),
-                Comment = new List<CommunityComment>(),
+                Board = new List<int>(),
+                Article = new List<int>(),
+                Comment = new List<int>(),
 
-                LoginInfo = new List<CommunityLoginInfo>(),
+                LoginInfo = new List<int>(),
             };
         }
 

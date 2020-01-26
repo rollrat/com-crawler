@@ -151,7 +151,7 @@ namespace com_crawler.Component
     {
         public int Index;
         public string Name;
-        public string URL;
+        public string Host;
         public string Description;
 
         public bool IsMobileOnly;
@@ -414,6 +414,10 @@ namespace com_crawler.Component
         {
             Type = ComponentType.CommunitySite;
         }
+
+        /// <summary>
+        /// Core API
+        /// </summary>
 
         public abstract void BuildSitemap();
 
