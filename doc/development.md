@@ -113,6 +113,12 @@ So, this class is created to define the tasks required after downloading.
 `Extractor` gets a NetTask that directs the download task from a specific `URL`.
 Seperated by `Host-Name`, all `crawling operations` are implemented here.
 
+## Component
+
+`Component` provide api, crawling, manufactoring, and rebuild data set funcitons.
+However, `extarctor` is designed for only downloading some contents like image, movie etc...
+So, you cannot extracting useful structed informations using extractor.
+
 ## Log
 
 This class records all download progress.
