@@ -53,6 +53,7 @@ namespace com_crawler.Component
         public string Name;
         public string Id;
         public string Description;
+        public string RawURL;
         public HashSet<CommunityInclinationType> Inclination;
         public virtual string MakeURL() { throw new NotImplementedException(); }
     }
@@ -62,7 +63,7 @@ namespace com_crawler.Component
         public int Index;
         public string Name;
         public List<int> SubCategories;
-        public List<int> Links;
+        public List<int> Boards;
     }
 
     public class CommunitySitemap
@@ -70,7 +71,7 @@ namespace com_crawler.Component
         public int Index;
         public int Context;
         public List<int> Categories;
-        public List<int> Links;
+        public List<int> Boards;
     }
 
     public class CommunityComment
@@ -179,18 +180,18 @@ namespace com_crawler.Component
 
     public class CommunityContextManager : ILazy<CommunityContextManager>
     {
-        List<CommunityContext> contexts;
+        public List<CommunityContext> contexts;
 
-        List<CommunitySitemap> Sitemap;
+        public List<CommunitySitemap> Sitemap;
 
-        List<CommunitySitemapCategory> CategoryMap;
-        List<CommunitySitemapBoard> BoardMap;
+        public List<CommunitySitemapCategory> CategoryMap;
+        public List<CommunitySitemapBoard> BoardMap;
 
-        List<CommunityBoard> Board;
-        List<CommunityArticle> Article;
-        List<CommunityComment> Comment;
+        public List<CommunityBoard> Board;
+        public List<CommunityArticle> Article;
+        public List<CommunityComment> Comment;
 
-        List<CommunityLoginInfo> LoginInfo;
+        public List<CommunityLoginInfo> LoginInfo;
 
         public CommunityContextManager()
         {
@@ -240,7 +241,7 @@ namespace com_crawler.Component
             {
                 Index = index,
                 Context = context,
-                Links = new List<int>(),
+                Boards = new List<int>(),
                 Categories = new List<int>(),
             });
 
@@ -254,7 +255,7 @@ namespace com_crawler.Component
             return CreateSitemap(context.Index);
         }
 
-        public static int CreateCategoryMap(string name)
+        public static int CreateCategoryMap(string name, List<int> sub_categories = null, List<int> boards = null)
         {
             Lock();
 
@@ -264,8 +265,8 @@ namespace com_crawler.Component
             {
                 Index = index,
                 Name = name,
-                SubCategories = new List<int>(),
-                Links = new List<int>(),
+                SubCategories = sub_categories ?? new List<int>(),
+                Boards = boards ?? new List<int>(),
             });
 
             Unlock();
@@ -273,7 +274,7 @@ namespace com_crawler.Component
             return index;
         }
 
-        public static (int, int) CreateBoardMapBoard<T>(int category, string name, string id = "", 
+        public static (int, int) CreateBoardMapBoard<T>(int category, string name, string id = "", string raw_url = null,
             string description = "", HashSet<CommunityInclinationType> inclination = null)
             where T : CommunitySitemapBoard, new()
         {
@@ -289,6 +290,7 @@ namespace com_crawler.Component
                 Board = index_of_board,
                 Name = name,
                 Id = id,
+                RawURL = raw_url,
                 Description = description,
                 Inclination = inclination,
             });
