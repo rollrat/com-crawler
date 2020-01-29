@@ -464,7 +464,9 @@ namespace com_crawler.Tool.CustomCrawler
 
         private void Cluster_Click(object sender, RoutedEventArgs e)
         {
+            var cc = tree.LinearClustering();
 
+            cc.Sort((x, y) => y.Item1.CompareTo(x.Item1));
         }
     }
 }
