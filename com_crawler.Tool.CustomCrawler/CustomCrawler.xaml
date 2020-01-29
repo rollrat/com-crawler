@@ -83,9 +83,13 @@
             <Button x:Name="Tree" Margin="0 4 0 0" Content="Tree" Click="Tree_Click"/>
             <Button x:Name="LCATree" Margin="0 4 0 0" Content="LCA Tree" Click="LCATree_Click"/>
             <Button x:Name="CAL" Margin="0 4 0 0" Content="CAL" Click="CAL_Click"/>
-            <Button x:Name="Manual" Margin="0 4 0 0" Content="Manual" Click="Manual_Click" IsEnabled="False"/>
-            <TextBlock Text="Etc" Margin="0 4 0 0"/>
-            <CheckBox x:Name="driverCheck" Content="Using driver" IsChecked="False"/>
+            <TextBlock Text="Sub Tools" Margin="0 4 0 0"/>
+            <Button x:Name="Diff" Content="Diff" Click="Diff_Click"/>
+            <Button x:Name="Cluster" Margin="0 4 0 0" Content="Cluster" Click="Cluster_Click"/>
+            <TextBlock Text="Options" Margin="0 4 0 0"/>
+            <CheckBox x:Name="driverCheck" Margin="0 4 0 0" Content="Using driver" IsChecked="False"/>
+            <TextBlock Text="Documents" Margin="0 16 0 0"/>
+            <Button x:Name="Manual" Content="Manual" Click="Manual_Click" IsEnabled="False"/>
         </StackPanel>
 
         <TextBlock Grid.Column="0" Grid.Row="3" Text="FILTER: " FontSize="15" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0 4 0 0"/>

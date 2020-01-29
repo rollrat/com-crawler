@@ -456,5 +456,15 @@ namespace com_crawler.Tool.CustomCrawler
         private void Manual_Click(object sender, RoutedEventArgs e)
         {
         }
+
+        private void Diff_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Cluster_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
