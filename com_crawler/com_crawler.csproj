@@ -25,7 +25,7 @@
   <ItemGroup>
     <Folder Include="Compiler\" />
     <Folder Include="Browser\" />
-    <Folder Include="Robot\" />
+    <Folder Include="Robot\Signal\" />
     <Folder Include="Server\" />
   </ItemGroup>
 

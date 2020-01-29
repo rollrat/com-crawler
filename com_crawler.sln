@@ -9,13 +9,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "com_crawler.Console", "com_
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "com_crawler.Tool.CustomCrawler", "com_crawler.Tool.CustomCrawler\com_crawler.Tool.CustomCrawler.csproj", "{1DC7E336-16BF-46BB-8D6D-453B7E219965}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "com_crawler.App", "com_crawler.App\com_crawler.App.csproj", "{54F0C220-D9BC-4B5F-AC38-174B740B6411}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "com_crawler.App", "com_crawler.App\com_crawler.App.csproj", "{54F0C220-D9BC-4B5F-AC38-174B740B6411}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "com_crawler.Web.Server", "com_crawler.Web\Server\com_crawler.Web.Server.csproj", "{14102B3B-4738-4D6C-ABEA-3C343B086FA3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "com_crawler.Web.Server", "com_crawler.Web\Server\com_crawler.Web.Server.csproj", "{14102B3B-4738-4D6C-ABEA-3C343B086FA3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "com_crawler.Web.Client", "com_crawler.Web\Client\com_crawler.Web.Client.csproj", "{A9CD0B31-EC86-4A21-A033-B850DDA1E571}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "com_crawler.Web.Client", "com_crawler.Web\Client\com_crawler.Web.Client.csproj", "{A9CD0B31-EC86-4A21-A033-B850DDA1E571}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "com_crawler.Web.Shared", "com_crawler.Web\Shared\com_crawler.Web.Shared.csproj", "{13100D90-09EA-45AB-9DBB-EBA9B476AC98}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "com_crawler.Web.Shared", "com_crawler.Web\Shared\com_crawler.Web.Shared.csproj", "{13100D90-09EA-45AB-9DBB-EBA9B476AC98}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "com_crawler.Windows", "com_crawler.Windows\com_crawler.Windows.csproj", "{EC5B6676-4173-4CAF-B000-EB2265223675}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +53,10 @@ Global
 		{13100D90-09EA-45AB-9DBB-EBA9B476AC98}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{13100D90-09EA-45AB-9DBB-EBA9B476AC98}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{13100D90-09EA-45AB-9DBB-EBA9B476AC98}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC5B6676-4173-4CAF-B000-EB2265223675}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC5B6676-4173-4CAF-B000-EB2265223675}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC5B6676-4173-4CAF-B000-EB2265223675}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC5B6676-4173-4CAF-B000-EB2265223675}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
