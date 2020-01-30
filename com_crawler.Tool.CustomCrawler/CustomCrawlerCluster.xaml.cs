@@ -9,11 +9,13 @@
 using CefSharp;
 using CefSharp.Wpf;
 using com_crawler.Html;
+using HtmlAgilityPack;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -100,12 +102,12 @@ namespace com_crawler.Tool.CustomCrawler
             }
         }
 
-        private void RunButton_Click(object sender, RoutedEventArgs e)
+        private async void RunButton_Click(object sender, RoutedEventArgs e)
         {
+            var list = new List<CustomCrawlerClusterDataGridItemViewModel>();
             if ((Functions.SelectedItem as ComboBoxItem).Content.ToString() == "LinearClustering")
             {
                 var rr = tree.LinearClustering();
-                var list = new List<CustomCrawlerClusterDataGridItemViewModel>();
 
                 for (int i = 0; i < rr.Count; i++)
                 {
@@ -119,8 +121,29 @@ namespace com_crawler.Tool.CustomCrawler
                     });
                 }
 
-                ResultList.DataContext = new CustomCrawlerClusterDataGridViewModel(list);
+                C2.Header = "Count";
+                C3.Header = "Accuracy";
+                C4.Header = "Header";
             }
+            else if ((Functions.SelectedItem as ComboBoxItem).Content.ToString() == "StylistClustering")
+            {
+                await Task.Run(() =>
+                {
+                    Application.Current.Dispatcher.BeginInvoke(new Action(
+                    delegate
+                    {
+                        browser.LoadHtml(tree[0][0].OuterHtml, url);
+                    }));
+                    Thread.Sleep(500);
+                });
+
+                stylist_clustering(ref list);
+
+                C2.Header = "Area"; // count of range
+                C3.Header = "Use(%)"; // use space
+                C4.Header = "Count"; // count of element
+            }
+            ResultList.DataContext = new CustomCrawlerClusterDataGridViewModel(list);
         }
 
         string before = "";
@@ -130,19 +153,22 @@ namespace com_crawler.Tool.CustomCrawler
         {
             if (ResultList.SelectedItems.Count > 0)
             {
-                var node = (ResultList.SelectedItems[0] as CustomCrawlerClusterDataGridItemViewModel).Node;
-
-                if (section)
+                if ((Functions.SelectedItem as ComboBoxItem).Content.ToString() == "LinearClustering")
                 {
-                    browser.LoadHtml(tree[0][0].OuterHtml, url);
-                    Thread.Sleep(100);
-                    section = false;
-                }
+                    var node = (ResultList.SelectedItems[0] as CustomCrawlerClusterDataGridItemViewModel).Node;
 
-                browser.EvaluateScriptAsync($"document.querySelector('[{before}]').style.border = '0em';").Wait();
-                before = $"ccw_tag={node.GetAttributeValue("ccw_tag", "")}";
-                browser.EvaluateScriptAsync($"document.querySelector('[{before}]').style.border = '1em solid #FDFF47';").Wait();
-                browser.EvaluateScriptAsync($"document.querySelector('[{before}]').scrollIntoView(true);").Wait();
+                    if (section)
+                    {
+                        browser.LoadHtml(tree[0][0].OuterHtml, url);
+                        Thread.Sleep(100);
+                        section = false;
+                    }
+
+                    browser.EvaluateScriptAsync($"document.querySelector('[{before}]').style.border = '0em';").Wait();
+                    before = $"ccw_tag={node.GetAttributeValue("ccw_tag", "")}";
+                    browser.EvaluateScriptAsync($"document.querySelector('[{before}]').style.border = '1em solid #FDFF47';").Wait();
+                    browser.EvaluateScriptAsync($"document.querySelector('[{before}]').scrollIntoView(true);").Wait();
+                }
             }
         }
 
@@ -150,14 +176,33 @@ namespace com_crawler.Tool.CustomCrawler
         {
             if (ResultList.SelectedItems.Count > 0)
             {
-                var node = (ResultList.SelectedItems[0] as CustomCrawlerClusterDataGridItemViewModel).Node;
+                if ((Functions.SelectedItem as ComboBoxItem).Content.ToString() == "LinearClustering")
+                {
+                    var node = (ResultList.SelectedItems[0] as CustomCrawlerClusterDataGridItemViewModel).Node;
 
-                if (node.Name == "tbody")
-                    browser.LoadHtml($"<table>{node.OuterHtml}</table>", url);
-                else
-                    browser.LoadHtml(node.OuterHtml, url);
+                    if (node.Name == "tbody")
+                        browser.LoadHtml($"<table>{node.OuterHtml}</table>", url);
+                    else
+                        browser.LoadHtml(node.OuterHtml, url);
 
-                section = true;
+                    section = true;
+                }
+                else if((Functions.SelectedItem as ComboBoxItem).Content.ToString() == "StylistClustering")
+                {
+                    var node = (ResultList.SelectedItems[0] as CustomCrawlerClusterDataGridItemViewModel).Node;
+
+                    if (section)
+                    {
+                        browser.LoadHtml(tree[0][0].OuterHtml, url);
+                        Thread.Sleep(100);
+                        section = false;
+                    }
+
+                    browser.EvaluateScriptAsync($"document.querySelector('[{before}]').style.border = '0em';").Wait();
+                    before = $"ccw_tag={node.GetAttributeValue("ccw_tag", "")}";
+                    browser.EvaluateScriptAsync($"document.querySelector('[{before}]').style.border = '1em solid #FDFF47';").Wait();
+                    browser.EvaluateScriptAsync($"document.querySelector('[{before}]').scrollIntoView(true);").Wait();
+                }
             }
         }
 
@@ -166,5 +211,67 @@ namespace com_crawler.Tool.CustomCrawler
             //browser.
         }
 
+        #region Stylist Clustering
+
+        private void stylist_clustering(ref List<CustomCrawlerClusterDataGridItemViewModel> result)
+        {
+            var pps = new List<List<(int?, int?, HtmlNode)>>();
+            var ppsd = new Dictionary<HtmlNode, (int, int)>();
+            for (int i = 0; i <= tree.Height; i++)
+            {
+                var pp = new List<(int?, int?, HtmlNode)>();
+                for (int j = 0; j < tree[i].Count; j++)
+                {
+                    var w = browser.EvaluateScriptAsync($"document.querySelector('[ccw_tag=ccw_{i}_{j}]').clientWidth").Result.Result;
+                    var h = browser.EvaluateScriptAsync($"document.querySelector('[ccw_tag=ccw_{i}_{j}]').clientHeight").Result.Result;
+
+                    pp.Add((w as int?, h as int?, tree[i][j]));
+                    ppsd.Add(tree[i][j], (i, j));
+                }
+                pps.Add(pp);
+            }
+
+            // area, use, use%, count
+            var rr = new List<(int, int, double, int, HtmlNode)>();
+            var max_area = 0;
+
+            for (int i = 0; i <= tree.Height; i++)
+                for (int j = 0; j < tree[i].Count; j++)
+                {
+                    if (!pps[i][j].Item1.HasValue)
+                        continue;
+                    int area = pps[i][j].Item1.Value * pps[i][j].Item2.Value;
+                    int cnt = 0;
+                    int use = 0;
+                    foreach (var child in tree[i][j].ChildNodes)
+                    {
+                        var ij = ppsd[child];
+                        if (!pps[ij.Item1][ij.Item2].Item1.HasValue)
+                            continue;
+                        cnt++;
+                        use += pps[ij.Item1][ij.Item2].Item1.Value * pps[ij.Item1][ij.Item2].Item2.Value;
+                    }
+                    if (use == 0)
+                        continue;
+                    max_area = Math.Max(max_area, area);
+
+                    rr.Add((area, use, use / (double)area * 100.0, cnt, tree[i][j]));
+                }
+
+            for (int i = 0; i < rr.Count; i++)
+            {
+
+                result.Add(new CustomCrawlerClusterDataGridItemViewModel
+                {
+                    Index = (i + 1).ToString(),
+                    Count = $"{rr[i].Item1.ToString("#,0")} ({(rr[i].Item1 / (double)max_area * 100.0).ToString("#0.0")} %)",
+                    Accuracy = $"{rr[i].Item2.ToString("#,0")} ({rr[i].Item3.ToString("#0.0")} %)",
+                    Header = rr[i].Item4.ToString(),
+                    Node = rr[i].Item5
+                });
+            }
+        }
+
+        #endregion
     }
 }

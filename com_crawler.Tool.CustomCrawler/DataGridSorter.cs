@@ -56,8 +56,8 @@ namespace com_crawler.Tool.CustomCrawler
                 T xItem = (T)x;
                 T yItem = (T)y;
 
-                string xText = xItem.GetType().GetProperty(column, BindingFlags.Public | BindingFlags.Instance).GetValue(xItem).ToString();
-                string yText = yItem.GetType().GetProperty(column, BindingFlags.Public | BindingFlags.Instance).GetValue(yItem).ToString();
+                string xText = xItem.GetType().GetProperty(column, BindingFlags.Public | BindingFlags.Instance).GetValue(xItem).ToString().Replace(",", "");
+                string yText = yItem.GetType().GetProperty(column, BindingFlags.Public | BindingFlags.Instance).GetValue(yItem).ToString().Replace(",", "");
 
                 return SortAlgorithm.ComparePath(xText, yText) * (this.@ascending ? 1 : -1);
             }
