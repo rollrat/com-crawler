@@ -28,13 +28,15 @@ namespace com_crawler.Tool.CustomCrawler
         HtmlNode root_node;
         List<HtmlNode> marking;
         List<HtmlNode> original_marking;
+        CustomCrawlerCluster cluster;
 
-        public CustomCrawlerTree(HtmlNode node, List<HtmlNode> marking)
+        public CustomCrawlerTree(HtmlNode node, List<HtmlNode> marking, CustomCrawlerCluster cluster = null)
         {
             InitializeComponent();
 
             root_node = node;
             original_marking = marking;
+            this.cluster = cluster;
             this.marking = new List<HtmlNode>();
             foreach (var snode in marking)
             {
@@ -132,6 +134,9 @@ namespace com_crawler.Tool.CustomCrawler
                 int child = 0;
                 node.ChildNodes.ToList().ForEach(x => { try { builder.Append($"[{child++.ToString().PadLeft(3, '0')}] {x.Name}, {x.XPath.Substring(node.XPath.Length)}\r\n"); } catch { } });
                 TextBox.Text = builder.ToString();
+
+                if (cluster != null)
+                    cluster.SelectNode(node);
             }
         }
 

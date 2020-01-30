@@ -71,6 +71,15 @@ namespace com_crawler.Tool.CustomCrawler
             KeyDown += CustomCrawlerCluster_KeyDown;
         }
 
+        private void Browser_IsBrowserInitializedChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            try
+            {
+                browser.LoadHtml(tree[0][0].OuterHtml, url);
+            }
+            catch { }
+        }
+
         private void CustomCrawlerCluster_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.F2)
@@ -102,18 +111,54 @@ namespace com_crawler.Tool.CustomCrawler
             }
             else if (e.Key == Key.F5)
             {
-                (new CustomCrawlerTree(tree.RootNode, new List<HtmlNode> { cbccw.selected_node })).Show();
+                new CustomCrawlerTree(cbccw.selected_node, new List<HtmlNode> { cbccw.selected_node }, this).Show();
+            }
+            else if (e.Key == Key.F6)
+            {
+                if (cbccw.selected_node != null)
+                {
+                }
+            }
+            else if (e.Key == Key.F7)
+            {
+                if (cbccw.selected_node != null)
+                {
+                }
+            }
+            else if (e.Key == Key.Add)
+            {
+                if (browser.ZoomLevel <= 3.0)
+                {
+                    browser.ZoomInCommand.Execute(null);
+                }
+            }
+            else if (e.Key == Key.Subtract)
+            {
+                if (browser.ZoomLevel >= -3.0)
+                {
+                    browser.ZoomOutCommand.Execute(null);
+                }
             }
         }
 
-        private void Browser_IsBrowserInitializedChanged(object sender, DependencyPropertyChangedEventArgs e)
+        #region Capture & Tree
+
+        public void SelectNode(HtmlNode node)
         {
-            try
-            {
-                browser.LoadHtml(tree[0][0].OuterHtml, url);
-            }
-            catch { }
+            F2.Text = "F2: UnLock";
+            locking = true;
+
+            var ij = tree.UnRef(node);
+            var dd = depth;
+            depth = 0;
+            cbccw.hoverelem($"ccw_{ij.Item1}_{ij.Item2}", true);
+            depth = dd;
+            browser.EvaluateScriptAsync($"document.querySelector('[ccw_tag=ccw_{ij.Item1}_{ij.Item2}]').scrollIntoView(true);").Wait();
         }
+
+        #endregion
+
+        #region Cef Callback
 
         bool locking = false;
         int depth = 0;
@@ -147,11 +192,15 @@ namespace com_crawler.Tool.CustomCrawler
                 Application.Current.Dispatcher.BeginInvoke(new Action(
                 delegate
                 {
-                    instance.hover_item.Text = instance.tree[i][j].XPath;
-                    instance.browser.EvaluateScriptAsync($"document.querySelector('[{before}]').style.border = '{before_border}';").Wait();
-                    before = $"ccw_tag=ccw_{i}_{j}";
-                    before_border = instance.browser.EvaluateScriptAsync($"document.querySelector('[{before}]').style.border").Result.Result.ToString();
-                    instance.browser.EvaluateScriptAsync($"document.querySelector('[{before}]').style.border = '0.2em solid red';").Wait();
+                    try
+                    {
+                        instance.hover_item.Text = instance.tree[i][j].XPath;
+                        instance.browser.EvaluateScriptAsync($"document.querySelector('[{before}]').style.border = '{before_border}';").Wait();
+                        before = $"ccw_tag=ccw_{i}_{j}";
+                        before_border = instance.browser.EvaluateScriptAsync($"document.querySelector('[{before}]').style.border").Result.Result.ToString();
+                        instance.browser.EvaluateScriptAsync($"document.querySelector('[{before}]').style.border = '0.2em solid red';").Wait();
+                    }
+                    catch { }
                 }));
             }
             public void adjust()
@@ -159,6 +208,8 @@ namespace com_crawler.Tool.CustomCrawler
                 hoverelem(latest_elem, true);
             }
         }
+
+        #endregion
 
         private async void RunButton_Click(object sender, RoutedEventArgs e)
         {
@@ -227,6 +278,22 @@ namespace com_crawler.Tool.CustomCrawler
                     browser.EvaluateScriptAsync($"document.querySelector('[{before}]').style.border = '1em solid #FDFF47';").Wait();
                     browser.EvaluateScriptAsync($"document.querySelector('[{before}]').scrollIntoView(true);").Wait();
                 }
+                else if ((Functions.SelectedItem as ComboBoxItem).Content.ToString() == "StylistClustering")
+                {
+                    var node = (ResultList.SelectedItems[0] as CustomCrawlerClusterDataGridItemViewModel).Node;
+
+                    if (section)
+                    {
+                        browser.LoadHtml(tree[0][0].OuterHtml, url);
+                        Thread.Sleep(100);
+                        section = false;
+                    }
+
+                    browser.EvaluateScriptAsync($"document.querySelector('[{before}]').style.border = '0em';").Wait();
+                    before = $"ccw_tag={node.GetAttributeValue("ccw_tag", "")}";
+                    browser.EvaluateScriptAsync($"document.querySelector('[{before}]').style.border = '1em solid #FDFF47';").Wait();
+                    browser.EvaluateScriptAsync($"document.querySelector('[{before}]').scrollIntoView(true);").Wait();
+                }
             }
         }
 
@@ -244,22 +311,6 @@ namespace com_crawler.Tool.CustomCrawler
                         browser.LoadHtml(node.OuterHtml, url);
 
                     section = true;
-                }
-                else if((Functions.SelectedItem as ComboBoxItem).Content.ToString() == "StylistClustering")
-                {
-                    var node = (ResultList.SelectedItems[0] as CustomCrawlerClusterDataGridItemViewModel).Node;
-
-                    if (section)
-                    {
-                        browser.LoadHtml(tree[0][0].OuterHtml, url);
-                        Thread.Sleep(100);
-                        section = false;
-                    }
-
-                    browser.EvaluateScriptAsync($"document.querySelector('[{before}]').style.border = '0em';").Wait();
-                    before = $"ccw_tag={node.GetAttributeValue("ccw_tag", "")}";
-                    browser.EvaluateScriptAsync($"document.querySelector('[{before}]').style.border = '1em solid #FDFF47';").Wait();
-                    browser.EvaluateScriptAsync($"document.querySelector('[{before}]').scrollIntoView(true);").Wait();
                 }
             }
         }
