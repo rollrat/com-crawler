@@ -95,7 +95,7 @@
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0 0 0 4">
-                <TextBlock Text="F2: Lock" FontSize="15"/>
+                <TextBlock x:Name="F2" Text="F2: Lock" FontSize="15"/>
                 <TextBlock Text="    " FontSize="15"/>
                 <TextBlock Text="F3: Depth(-)" FontSize="15"/>
                 <TextBlock Text="    " FontSize="15"/>
@@ -104,6 +104,8 @@
                 <TextBlock Text="F5: Quick Capture" FontSize="15"/>
                 <TextBlock Text="    " FontSize="15"/>
                 <TextBlock Text="F6: Capture" FontSize="15"/>
+                <TextBlock Text="    " FontSize="15"/>
+                <TextBlock x:Name="Depth" Text="Depth=0" FontSize="15"/>
             </StackPanel>
             
             <Border Grid.Row="1" BorderThickness="1" BorderBrush="LightGray">

@@ -17,6 +17,7 @@ namespace com_crawler.Html
         HtmlNode root_node;
         List<List<HtmlNode>> depth_map;
         Dictionary<HtmlNode, int> depth_ref;
+        Dictionary<HtmlNode, (int, int)> unref;
 
         public HtmlTree(string html)
         {
@@ -24,6 +25,8 @@ namespace com_crawler.Html
             document.LoadHtml(html);
             root_node = document.DocumentNode;
         }
+
+        public HtmlNode RootNode { get { return root_node; } }
 
         /// <summary>
         /// Gets the maximum depth of the HTML tree.
@@ -50,6 +53,11 @@ namespace com_crawler.Html
             get { return depth_ref[node]; }
         }
 
+        public (int, int) UnRef(HtmlNode node)
+        {
+            return unref[node];
+        }
+
         /// <summary>
         /// Visit all nodes in the HTML tree and generate a depth map.
         /// </summary>
@@ -59,6 +67,7 @@ namespace com_crawler.Html
         {
             depth_map = new List<List<HtmlNode>>();
             depth_ref = new Dictionary<HtmlNode, int>();
+            unref = new Dictionary<HtmlNode, (int, int)>();
 
             var queue = new Queue<Tuple<int, HtmlNode>>();
             var nodes = new List<HtmlNode>();
@@ -93,7 +102,11 @@ namespace com_crawler.Html
                 depth_map.Add(nodes);
 
             for (int i = 0; i < depth_map.Count; i++)
+            {
                 depth_map[i].ForEach(x => depth_ref.Add(x, i));
+                for (int j = 0; j < depth_map[i].Count; j++)
+                    unref.Add(depth_map[i][j], (i, j));
+            }
         }
 
         /// <summary>

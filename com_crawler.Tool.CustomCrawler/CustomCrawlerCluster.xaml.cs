@@ -35,6 +35,7 @@ namespace com_crawler.Tool.CustomCrawler
         ChromiumWebBrowser browser;
         string url;
         HtmlTree tree;
+        CallbackCCW cbccw;
 
         public CustomCrawlerCluster(string url, HtmlTree tree)
         {
@@ -46,7 +47,7 @@ namespace com_crawler.Tool.CustomCrawler
             browser.IsBrowserInitializedChanged += Browser_IsBrowserInitializedChanged;
 
             CefSharpSettings.LegacyJavascriptBindingEnabled = true;
-            browser.JavascriptObjectRepository.Register("ccw", new CallbackCCW(this), isAsync: true);
+            browser.JavascriptObjectRepository.Register("ccw", cbccw = new CallbackCCW(this), isAsync: true);
 
             this.url = url;
             this.tree = tree;
@@ -66,6 +67,43 @@ namespace com_crawler.Tool.CustomCrawler
                     }
                 }
             }
+
+            KeyDown += CustomCrawlerCluster_KeyDown;
+        }
+
+        private void CustomCrawlerCluster_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.F2)
+            {
+                if (locking)
+                {
+                    F2.Text = "F2: Lock";
+                    locking = false;
+                }
+                else
+                {
+                    F2.Text = "F2: UnLock";
+                    locking = true;
+                }
+            }
+            else if (e.Key == Key.F3)
+            {
+                depth--;
+                if (depth < 0)
+                    depth = 0;
+                Depth.Text = $"Depth={depth}";
+                cbccw.adjust();
+            }
+            else if (e.Key == Key.F4)
+            {
+                depth++;
+                Depth.Text = $"Depth={depth}";
+                cbccw.adjust();
+            }
+            else if (e.Key == Key.F5)
+            {
+                (new CustomCrawlerTree(tree.RootNode, new List<HtmlNode> { cbccw.selected_node })).Show();
+            }
         }
 
         private void Browser_IsBrowserInitializedChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -77,19 +115,35 @@ namespace com_crawler.Tool.CustomCrawler
             catch { }
         }
 
+        bool locking = false;
+        int depth = 0;
+
         public class CallbackCCW
         {
             CustomCrawlerCluster instance;
             string before = "";
             string before_border = "";
+            string latest_elem = "";
+            public HtmlNode selected_node;
             public CallbackCCW(CustomCrawlerCluster instance)
             {
                 this.instance = instance;
             }
-            public void hoverelem(string elem)
+            public void hoverelem(string elem, bool adjust = false)
             {
+                if (instance.locking && !adjust)
+                    return;
+                latest_elem = elem;
                 var i = Convert.ToInt32(elem.Split('_')[1]);
                 var j = Convert.ToInt32(elem.Split('_')[2]);
+                for (int k = 0; k < instance.depth; k++)
+                {
+                    if (instance.tree[i][j].ParentNode == instance.tree.RootNode)
+                        break;
+                    var rr = instance.tree.UnRef(instance.tree[i][j].ParentNode);
+                    (i, j) = rr;
+                }
+                selected_node = instance.tree[i][j];
                 Application.Current.Dispatcher.BeginInvoke(new Action(
                 delegate
                 {
@@ -99,6 +153,10 @@ namespace com_crawler.Tool.CustomCrawler
                     before_border = instance.browser.EvaluateScriptAsync($"document.querySelector('[{before}]').style.border").Result.Result.ToString();
                     instance.browser.EvaluateScriptAsync($"document.querySelector('[{before}]').style.border = '0.2em solid red';").Wait();
                 }));
+            }
+            public void adjust()
+            {
+                hoverelem(latest_elem, true);
             }
         }
 
@@ -139,9 +197,9 @@ namespace com_crawler.Tool.CustomCrawler
 
                 stylist_clustering(ref list);
 
-                C2.Header = "Area"; // count of range
+                C2.Header = "Count"; // count of element
                 C3.Header = "Use(%)"; // use space
-                C4.Header = "Count"; // count of element
+                C4.Header = "Area"; // count of range
             }
             ResultList.DataContext = new CustomCrawlerClusterDataGridViewModel(list);
         }
@@ -260,13 +318,12 @@ namespace com_crawler.Tool.CustomCrawler
 
             for (int i = 0; i < rr.Count; i++)
             {
-
                 result.Add(new CustomCrawlerClusterDataGridItemViewModel
                 {
                     Index = (i + 1).ToString(),
-                    Count = $"{rr[i].Item1.ToString("#,0")} ({(rr[i].Item1 / (double)max_area * 100.0).ToString("#0.0")} %)",
+                    Count = rr[i].Item4.ToString(),
                     Accuracy = $"{rr[i].Item2.ToString("#,0")} ({rr[i].Item3.ToString("#0.0")} %)",
-                    Header = rr[i].Item4.ToString(),
+                    Header = $"{rr[i].Item1.ToString("#,0")} ({(rr[i].Item1 / (double)max_area * 100.0).ToString("#0.0")} %)",
                     Node = rr[i].Item5
                 });
             }
