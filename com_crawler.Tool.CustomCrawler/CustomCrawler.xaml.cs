@@ -25,6 +25,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using com_crawler.Html;
+using CefSharp;
+using CefSharp.Wpf;
 
 namespace com_crawler.Tool.CustomCrawler
 {
@@ -34,6 +36,7 @@ namespace com_crawler.Tool.CustomCrawler
         {
             InitializeComponent();
 
+            Cef.Initialize(new CefSettings());
             HTMLList.DataContext = new CustomCrawlerDataGridViewModel();
             HTMLList.Sorting += new DataGridSortingEventHandler(new DataGridSorter<CustomCrawlerDataGridItemViewModel>(HTMLList).SortHandler);
         }
@@ -57,7 +60,12 @@ namespace com_crawler.Tool.CustomCrawler
                 {
                     string html;
                     if (!File.Exists(URLText.Text))
-                        html = NetCommon.DownloadString(URLText.Text);
+                    {
+                        var client = NetCommon.GetDefaultClient();
+                        if (EucKR.IsChecked == true)
+                            client.Encoding = Encoding.GetEncoding(51949);
+                        html = client.DownloadString(URLText.Text);
+                    }
                     else
                         html = File.ReadAllText(URLText.Text);
                     tree = new HtmlTree(html);
@@ -464,7 +472,7 @@ namespace com_crawler.Tool.CustomCrawler
 
         private void Cluster_Click(object sender, RoutedEventArgs e)
         {
-            (new CustomCrawlerCluster(tree)).Show();
+            (new CustomCrawlerCluster(root_url, tree)).Show();
             //var cc = tree.LinearClustering();
 
             //cc.Sort((x, y) => y.Item1.CompareTo(x.Item1));

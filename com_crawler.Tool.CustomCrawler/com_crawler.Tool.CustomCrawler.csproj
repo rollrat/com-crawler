@@ -104,6 +104,7 @@
     <Compile Include="CustomCrawlerCAL.xaml.cs">
       <DependentUpon>CustomCrawlerCAL.xaml</DependentUpon>
     </Compile>
+    <Compile Include="CustomCrawlerClusterDataGridViewModel.cs" />
     <Compile Include="SeleniumWrapper.cs" />
     <Page Include="CustomCrawler.xaml">
       <Generator>MSBuild:Compile</Generator>

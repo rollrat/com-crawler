@@ -88,6 +88,7 @@
             <Button x:Name="Cluster" Margin="0 4 0 0" Content="Cluster" Click="Cluster_Click"/>
             <TextBlock Text="Options" Margin="0 4 0 0"/>
             <CheckBox x:Name="driverCheck" Margin="0 4 0 0" Content="Using driver" IsChecked="False"/>
+            <CheckBox x:Name="EucKR" Content="Using EUC-KR" IsChecked="False"/>
             <TextBlock Text="Documents" Margin="0 16 0 0"/>
             <Button x:Name="Manual" Content="Manual" Click="Manual_Click" IsEnabled="False"/>
         </StackPanel>
