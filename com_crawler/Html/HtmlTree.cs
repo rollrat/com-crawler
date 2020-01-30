@@ -92,7 +92,7 @@ namespace com_crawler.Html
             if (nodes.Count > 0)
                 depth_map.Add(nodes);
 
-            for (int i = 0; i < nodes.Count; i++)
+            for (int i = 0; i < depth_map.Count; i++)
                 depth_map[i].ForEach(x => depth_ref.Add(x, i));
         }
 
