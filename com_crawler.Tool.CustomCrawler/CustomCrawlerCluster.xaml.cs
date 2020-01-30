@@ -94,7 +94,7 @@ namespace com_crawler.Tool.CustomCrawler
                     instance.hover_item.Text = instance.tree[i][j].XPath;
                     instance.browser.EvaluateScriptAsync($"document.querySelector('[{before}]').style.border = '{before_border}';").Wait();
                     before = $"ccw_tag=ccw_{i}_{j}";
-                    //before_border = instance.browser.EvaluateScriptAsync($"document.querySelector('[{before}]').style.border").Result.Result.ToString();
+                    before_border = instance.browser.EvaluateScriptAsync($"document.querySelector('[{before}]').style.border").Result.Result.ToString();
                     instance.browser.EvaluateScriptAsync($"document.querySelector('[{before}]').style.border = '0.2em solid red';").Wait();
                 }));
             }
