@@ -472,10 +472,8 @@ namespace com_crawler.Tool.CustomCrawler
 
         private void Cluster_Click(object sender, RoutedEventArgs e)
         {
-            (new CustomCrawlerCluster(root_url, tree)).Show();
-            //var cc = tree.LinearClustering();
-
-            //cc.Sort((x, y) => y.Item1.CompareTo(x.Item1));
+            if (tree != null)
+                new CustomCrawlerCluster(root_url, tree).Show();
         }
     }
 }
