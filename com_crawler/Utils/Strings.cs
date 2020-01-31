@@ -52,6 +52,27 @@ namespace com_crawler.Utils
             }
         }
 
+        public static int ComputeLevenshteinDistance(this string a, string b)
+        {
+            int x = a.Length;
+            int y = b.Length;
+            int i, j;
+
+            if (x == 0) return x;
+            if (y == 0) return y;
+            int[] v0 = new int[(y + 1) << 1];
+
+            for (i = 0; i < y + 1; i++) v0[i] = i;
+            for (i = 0; i < x; i++)
+            {
+                v0[y + 1] = i + 1;
+                for (j = 0; j < y; j++)
+                    v0[y + j + 2] = Math.Min(Math.Min(v0[y + j + 1], v0[j + 1]) + 1, v0[j] + ((a[i] == b[j]) ? 0 : 1));
+                for (j = 0; j < y + 1; j++) v0[j] = v0[y + j + 1];
+            }
+            return v0[y + y + 1];
+        }
+
         // https://stackoverflow.com/questions/1601834/c-implementation-of-or-alternative-to-strcmplogicalw-in-shlwapi-dll
         public class NaturalComparer : IComparer<string>
         {
