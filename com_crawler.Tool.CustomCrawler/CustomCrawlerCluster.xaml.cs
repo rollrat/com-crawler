@@ -9,6 +9,7 @@
 using CefSharp;
 using CefSharp.Wpf;
 using com_crawler.Html;
+using com_crawler.Utils;
 using HtmlAgilityPack;
 using System;
 using System.Collections.Generic;
@@ -54,6 +55,10 @@ namespace com_crawler.Tool.CustomCrawler
 
             ResultList.DataContext = new CustomCrawlerClusterDataGridViewModel();
             ResultList.Sorting += new DataGridSortingEventHandler(new DataGridSorter<CustomCrawlerClusterDataGridItemViewModel>(ResultList).SortHandler);
+            CaptureList.DataContext = new CustomCrawlerClusterCaptureDataGridViewModel();
+            CaptureList.Sorting += new DataGridSortingEventHandler(new DataGridSorter<CustomCrawlerClusterCaptureDataGridItemViewModel>(CaptureList).SortHandler);
+            PatternList.DataContext = new CustomCrawlerClusterPatternDataGridViewModel();
+            PatternList.Sorting += new DataGridSortingEventHandler(new DataGridSorter<CustomCrawlerClusterPatternDataGridItemViewModel>(PatternList).SortHandler);
 
             for (int i = 0; i <= tree.Height; i++)
             {
@@ -75,7 +80,7 @@ namespace com_crawler.Tool.CustomCrawler
         {
             try
             {
-                browser.LoadHtml(tree[0][0].OuterHtml, url);
+                refresh();
             }
             catch { }
         }
@@ -144,15 +149,50 @@ namespace com_crawler.Tool.CustomCrawler
                     browser.ZoomOutCommand.Execute(null);
                 }
             }
+            else if (e.Key == Key.F8)
+            {
+                if (cbccw.selected_node != null)
+                {
+                    var tar = cbccw.selected_node.GetAttributeValue("ccw_tag", "");
+                    if (Marking.Contains(tar))
+                    {
+                        Marking.Remove(tar);
+                        cbccw.before_border = "";
+                        browser.EvaluateScriptAsync($"document.querySelector('[ccw_tag={tar}]').style.border = '';").Wait();
+                    }
+                    else
+                    {
+                        Marking.Add(cbccw.selected_node.GetAttributeValue("ccw_tag", ""));
+                        refresh_marking();
+                    }
+                }
+            }
         }
 
-        #region Capture & Tree
+        private void refresh()
+        {
+            browser.LoadHtml(tree[0][0].OuterHtml, url);
+            Thread.Sleep(100);
+            refresh_marking();
+        }
+
+        public List<string> Marking = new List<string>();
+        private void refresh_marking()
+        {
+            var builder = new StringBuilder();
+            foreach (var mm in Marking)
+                builder.Append($"document.querySelector('[ccw_tag={mm}]').style.border = '0.2em solid orange';");
+            browser.EvaluateScriptAsync(builder.ToString()).Wait();
+        }
+
+        #region Tree, Capture, Pattern
 
         public void AppendCapture(string info)
         {
-            CaptureList.Items.Add(new CustomCrawlerClusterCaptureDataGridItemViewModel
+            var index = CaptureList.Items.Count + 1;
+            (CaptureList.DataContext as CustomCrawlerClusterCaptureDataGridViewModel).Items.Add(new CustomCrawlerClusterCaptureDataGridItemViewModel
             {
-                Index = (CaptureList.Items.Count + 1).ToString(),
+                Index = index.ToString(),
                 Info = info,
                 DateTime = DateTime.Now.ToString("h:mm ss"),
                 Node = cbccw.selected_node,
@@ -172,6 +212,161 @@ namespace com_crawler.Tool.CustomCrawler
             browser.EvaluateScriptAsync($"document.querySelector('[ccw_tag=ccw_{ij.Item1}_{ij.Item2}]').scrollIntoView(true);").Wait();
         }
 
+        private void CaptureList_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Delete)
+            {
+                if (CaptureList.SelectedItems.Count > 0)
+                {
+                    if (MessageBox.Show($"Are you sure you want to delete {CaptureList.SelectedItems.Count} items?", "Cluster", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                    {
+                        CaptureList.SelectedItems.Cast<object>().ToList().ForEach(x => (CaptureList.DataContext as CustomCrawlerClusterCaptureDataGridViewModel).Items.Remove(x as CustomCrawlerClusterCaptureDataGridItemViewModel));
+                    }
+                }
+            }
+        }
+
+        private void ExtractPatterns_Click(object sender, RoutedEventArgs e)
+        {
+            if (CaptureList.SelectedItems.Count <= 1)
+            {
+                MessageBox.Show("Select two and more items!", "Cluster", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            var selected = CaptureList.SelectedItems.OfType<CustomCrawlerClusterCaptureDataGridItemViewModel>();
+            var lca = tree.GetLCANode(selected.Select(x => (tree[x.Node], x.Node).ToTuple()).ToList());
+
+            try
+            {
+                var pattern = new Pattern
+                {
+                    LCA = lca,
+                    Nodes = selected.Select(x => (x.Info, x.Node)).ToList(),
+                    SubPatternsString = selected.Select(x => make_string(x.Node)).ToList(),
+                    Content = make_string(lca),
+                    Info = make_string(lca, selected.ToDictionary(x => x.Node, x => "@" + x.Info))
+                };
+
+                (PatternList.DataContext as CustomCrawlerClusterPatternDataGridViewModel).Items.Add(new CustomCrawlerClusterPatternDataGridItemViewModel
+                {
+                    Index = (PatternList.Items.Count + 1).ToString(),
+                    Pattern = pattern.Info,
+                    Patterns = pattern
+                });
+            }
+            catch
+            {
+                MessageBox.Show("Do not select same elements!", "Cluster", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        Dictionary<HtmlNode, string> msdp = new Dictionary<HtmlNode, string>();
+        private string make_string(HtmlNode node)
+        {
+            if (node.ChildNodes.Count == 0)
+            {
+                if (node.Name == "#text")
+                    return "#";
+                return $"({node.Name})";
+            }
+            if (msdp.ContainsKey(node))
+                return msdp[node];
+            var ms = $"({node.Name}{string.Join("", node.ChildNodes.ToList().Where(x => x.Name != "#comment").Select(x => make_string(x)))})";
+            msdp.Add(node, ms);
+            return ms;
+        }
+
+        private string make_string(HtmlNode node, Dictionary<HtmlNode, string> snodes)
+        {
+            if (snodes != null && snodes.ContainsKey(node))
+                return snodes[node];
+            if (node.ChildNodes.Count == 0)
+            {
+                if (node.Name == "#text")
+                    return "#";
+                return $"({node.Name})";
+            }
+            return $"({node.Name}{string.Join("", node.ChildNodes.ToList().Where(x => x.Name != "#comment").Select(x => make_string(x, snodes)))})";
+        }
+
+        public class Pattern
+        {
+            public HtmlNode LCA { get; set; }
+            public List<(string, HtmlNode)> Nodes { get; set; }
+            public List<string> SubPatternsString { get; set; }
+            public string Content { get; set; }
+            public string Info { get; set; }
+        }
+
+        private void CaptureList_SelectedCellsChanged(object sender, SelectedCellsChangedEventArgs e)
+        {
+            if (CaptureList.SelectedItems.Count > 0)
+            {
+                var node = (CaptureList.SelectedItems[0] as CustomCrawlerClusterCaptureDataGridItemViewModel).Node;
+
+                if (section)
+                {
+                    refresh();
+                    section = false;
+                }
+
+                browser.EvaluateScriptAsync($"document.querySelector('[{before}]').style.border = '0em';").Wait();
+                before = $"ccw_tag={node.GetAttributeValue("ccw_tag", "")}";
+                browser.EvaluateScriptAsync($"document.querySelector('[{before}]').style.border = '1em solid #FDFF47';").Wait();
+                browser.EvaluateScriptAsync($"document.querySelector('[{before}]').scrollIntoView(true);").Wait();
+            }
+        }
+
+        string before_find = "";
+        private void FindPatternsOnPage_Click(object sender, RoutedEventArgs e)
+        {
+            if (PatternList.SelectedItems.Count != 1)
+            {
+                MessageBox.Show("Selects only one item!", "Cluster", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            // Build nodes
+            make_string(tree.RootNode);
+
+            var pattern = PatternList.SelectedItems[0] as CustomCrawlerClusterPatternDataGridItemViewModel;
+            var candidate = new List<(HtmlNode, string)>();
+
+            if (!AllowRoughly.IsChecked.Value)
+            {
+                foreach (var pp in msdp)
+                    if (pp.Value == pattern.Patterns.Content)
+                        candidate.Add((pp.Key, "100.0%"));
+            }
+            else
+            {
+                foreach (var pp in msdp)
+                {
+                    var distance = Strings.ComputeLevenshteinDistance(pp.Value, pattern.Patterns.Content);
+                    var per = 100.0 - distance / (double)Math.Max(pp.Value.Length, pattern.Patterns.Content.Length) * 100.0;
+                    if (per >= AccuracyPattern.Value)
+                        candidate.Add((pp.Key, per.ToString("0.0") + "%"));
+                }
+            }
+
+            var builder = new StringBuilder();
+
+            browser.EvaluateScriptAsync(before_find).Wait();
+            candidate.ForEach(x => builder.Append($"document.querySelector('[ccw_tag={x.Item1.GetAttributeValue("ccw_tag", "")}]').style.border = '0.2em solid #FDFF47';"));
+            browser.EvaluateScriptAsync(builder.ToString()).Wait();
+            browser.EvaluateScriptAsync($"document.querySelector('[ccw_tag={candidate[0].Item1.GetAttributeValue("ccw_tag", "")}]').scrollIntoView(true);").Wait();
+            before_find = string.Join("", candidate.Select(x => $"document.querySelector('[ccw_tag={x.Item1.GetAttributeValue("ccw_tag", "")}]').style.border = '';"));
+
+            MessageBox.Show($"Found {candidate.Count} three identical patterns!\r\n" + string.Join("\r\n", candidate.Select(x => $"({x.Item2}) {x.Item1.XPath}")), "Cluster", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (PatternAccuracy != null)
+                PatternAccuracy.Text = (sender as Slider).Value.ToString("0.0") + "%";
+        }
+
         #endregion
 
         #region Cef Callback
@@ -183,7 +378,7 @@ namespace com_crawler.Tool.CustomCrawler
         {
             CustomCrawlerCluster instance;
             string before = "";
-            string before_border = "";
+            public string before_border = "";
             string latest_elem = "";
             public HtmlNode selected_node;
             public CallbackCCW(CustomCrawlerCluster instance)
@@ -210,6 +405,7 @@ namespace com_crawler.Tool.CustomCrawler
                 {
                     try
                     {
+                        instance.refresh_marking();
                         instance.hover_item.Text = instance.tree[i][j].XPath;
                         instance.browser.EvaluateScriptAsync($"document.querySelector('[{before}]').style.border = '{before_border}';").Wait();
                         before = $"ccw_tag=ccw_{i}_{j}";
@@ -257,7 +453,7 @@ namespace com_crawler.Tool.CustomCrawler
                     Application.Current.Dispatcher.BeginInvoke(new Action(
                     delegate
                     {
-                        browser.LoadHtml(tree[0][0].OuterHtml, url);
+                        refresh();
                     }));
                     Thread.Sleep(500);
                 });
@@ -284,8 +480,7 @@ namespace com_crawler.Tool.CustomCrawler
 
                     if (section)
                     {
-                        browser.LoadHtml(tree[0][0].OuterHtml, url);
-                        Thread.Sleep(100);
+                        refresh();
                         section = false;
                     }
 
@@ -300,8 +495,7 @@ namespace com_crawler.Tool.CustomCrawler
 
                     if (section)
                     {
-                        browser.LoadHtml(tree[0][0].OuterHtml, url);
-                        Thread.Sleep(100);
+                        refresh();
                         section = false;
                     }
 

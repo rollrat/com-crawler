@@ -7,6 +7,10 @@
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
         Title="Custom Crawler Cluster" Height="826.49" Width="2154.85">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="b2v" />
+    </Window.Resources>
+    
     <Grid Margin="8">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
@@ -109,6 +113,8 @@
                 <TextBlock Text="    " FontSize="15"/>
                 <TextBlock Text="F7: Capture" FontSize="15"/>
                 <TextBlock Text="    " FontSize="15"/>
+                <TextBlock Text="F8: Marking" FontSize="15"/>
+                <TextBlock Text="    " FontSize="15"/>
                 <TextBlock x:Name="Depth" Text="Depth=0" FontSize="15"/>
             </StackPanel>
 
@@ -128,40 +134,101 @@
         <Grid Grid.Column="4" Width="400">
             <StackPanel>
                 <GroupBox Header="CaptureList" Height="300">
-                    <DataGrid x:Name="CaptureList" ItemsSource="{Binding Items}" CanUserSortColumns="True" IsReadOnly="True" AutoGenerateColumns="False"
-                  SelectionMode="Extended" SelectionUnit="FullRow" IsSynchronizedWithCurrentItem="True" BorderThickness="1" Background="White"
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <DataGrid x:Name="CaptureList" ItemsSource="{Binding Items}" CanUserSortColumns="True" IsReadOnly="True" AutoGenerateColumns="False" SelectedCellsChanged="CaptureList_SelectedCellsChanged"
+                  SelectionMode="Extended" SelectionUnit="FullRow" IsSynchronizedWithCurrentItem="True" BorderThickness="1" Background="White" Grid.Row="0" PreviewKeyDown="CaptureList_KeyDown"
                   CanUserAddRows="False" materialDesign:DataGridAssist.CellPadding="4 2 2 2" materialDesign:DataGridAssist.ColumnHeaderPadding="4 2 2 2" Margin="0 7 0 0">
-                        <DataGrid.Resources>
-                            <ResourceDictionary>
-                                <ResourceDictionary.MergedDictionaries>
-                                    <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.DataGrid.xaml" />
-                                    <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml" />
-                                    <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
-                                </ResourceDictionary.MergedDictionaries>
-                            </ResourceDictionary>
-                        </DataGrid.Resources>
-                        <DataGrid.Columns>
-                            <materialDesign:MaterialDataGridTextColumn Binding="{Binding Index}" Width="60" Header="Index" ElementStyle="{StaticResource TextBlockStyleKey}"
+                            <DataGrid.Resources>
+                                <ResourceDictionary>
+                                    <ResourceDictionary.MergedDictionaries>
+                                        <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.DataGrid.xaml" />
+                                        <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml" />
+                                        <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
+                                    </ResourceDictionary.MergedDictionaries>
+                                </ResourceDictionary>
+                            </DataGrid.Resources>
+                            <DataGrid.Columns>
+                                <materialDesign:MaterialDataGridTextColumn Binding="{Binding Index}" Width="60" Header="Index" ElementStyle="{StaticResource TextBlockStyleKey}"
                                                            EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnPopupEditingStyle}" SortDirection="Descending"/>
-                            <materialDesign:MaterialDataGridTextColumn Binding="{Binding Info}" Width="200" Header="Info" ElementStyle="{StaticResource TextBlockStyleKey}"
+                                <materialDesign:MaterialDataGridTextColumn Binding="{Binding Info}" Width="200" Header="Info" ElementStyle="{StaticResource TextBlockStyleKey}"
                                                            EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnPopupEditingStyle}"/>
-                            <materialDesign:MaterialDataGridTextColumn Binding="{Binding DateTime}" Width="120" Header="DateTime" ElementStyle="{StaticResource TextBlockStyleKey}"
+                                <materialDesign:MaterialDataGridTextColumn Binding="{Binding DateTime}" Width="120" Header="DateTime" ElementStyle="{StaticResource TextBlockStyleKey}"
                                                            EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnPopupEditingStyle}"/>
-                        </DataGrid.Columns>
-                        <DataGrid.CellStyle>
-                            <Style TargetType="DataGridCell">
-                                <Setter Property="Height" Value="25"/>
-                                <Style.Triggers>
-                                    <Trigger Property="IsSelected" Value="True">
-                                        <Setter Property="BorderThickness" Value="0" />
-                                        <Setter Property="Background" Value="Gray"/>
-                                        <Setter Property="VerticalAlignment" Value="Center"/>
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </DataGrid.CellStyle>
-                    </DataGrid>
+                            </DataGrid.Columns>
+                            <DataGrid.CellStyle>
+                                <Style TargetType="DataGridCell">
+                                    <Setter Property="Height" Value="25"/>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter Property="BorderThickness" Value="0" />
+                                            <Setter Property="Background" Value="Gray"/>
+                                            <Setter Property="VerticalAlignment" Value="Center"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGrid.CellStyle>
+                        </DataGrid>
+                        <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="0 4 0 0" HorizontalAlignment="Right">
+                            <Button Content="Extract Patterns" Width="150" Click="ExtractPatterns_Click"/>
+                        </StackPanel>
+                    </Grid>
+                </GroupBox>
+                <GroupBox Header="Patterns" Height="221">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <DataGrid x:Name="PatternList" ItemsSource="{Binding Items}" CanUserSortColumns="True" IsReadOnly="True" AutoGenerateColumns="False"
+                  SelectionMode="Extended" SelectionUnit="FullRow" IsSynchronizedWithCurrentItem="True" BorderThickness="1" Background="White" Grid.Row="0"
+                  CanUserAddRows="False" materialDesign:DataGridAssist.CellPadding="4 2 2 2" materialDesign:DataGridAssist.ColumnHeaderPadding="4 2 2 2" Margin="0 7 0 0">
+                            <DataGrid.Resources>
+                                <ResourceDictionary>
+                                    <ResourceDictionary.MergedDictionaries>
+                                        <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.DataGrid.xaml" />
+                                        <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml" />
+                                        <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
+                                    </ResourceDictionary.MergedDictionaries>
+                                </ResourceDictionary>
+                            </DataGrid.Resources>
+                            <DataGrid.Columns>
+                                <materialDesign:MaterialDataGridTextColumn Binding="{Binding Index}" Width="60" Header="Index" ElementStyle="{StaticResource TextBlockStyleKey}"
+                                                           EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnPopupEditingStyle}" SortDirection="Descending"/>
+                                <materialDesign:MaterialDataGridTextColumn Binding="{Binding Pattern}" Width="310" Header="Pattern" ElementStyle="{StaticResource TextBlockStyleKey}"
+                                                           EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnPopupEditingStyle}"/>
+                            </DataGrid.Columns>
+                            <DataGrid.CellStyle>
+                                <Style TargetType="DataGridCell">
+                                    <Setter Property="Height" Value="25"/>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter Property="BorderThickness" Value="0" />
+                                            <Setter Property="Background" Value="Gray"/>
+                                            <Setter Property="VerticalAlignment" Value="Center"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGrid.CellStyle>
+                        </DataGrid>
+                        <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="0 4 0 0" HorizontalAlignment="Right">
+                            <CheckBox x:Name="AllowRoughly" Content="Similarity based Find" VerticalAlignment="Center" Margin="0 0 8 0" IsChecked="True"/>
+                            <Button Content="Find Patterns on Page" Width="200" Click="FindPatternsOnPage_Click"/>
+                        </StackPanel>
+                        <Grid Grid.Row="2" Margin="4 4 4 0" Visibility="{Binding IsChecked,ElementName=AllowRoughly,Converter={StaticResource b2v}}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
 
+                            <Slider x:Name="AccuracyPattern" Grid.Column="0" ValueChanged="Slider_ValueChanged" Margin="0 0 8 0" Maximum="100" Minimum="0" TickFrequency="0.1" Value="80"/>
+                            <TextBlock x:Name="PatternAccuracy" Text="80.0%" Grid.Column="1"/>
+                        </Grid>
+                    </Grid>
                 </GroupBox>
             </StackPanel>
         </Grid>
