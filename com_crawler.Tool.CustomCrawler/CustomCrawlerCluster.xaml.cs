@@ -117,12 +117,17 @@ namespace com_crawler.Tool.CustomCrawler
             {
                 if (cbccw.selected_node != null)
                 {
+                    AppendCapture(cbccw.selected_node.XPath);
                 }
             }
             else if (e.Key == Key.F7)
             {
                 if (cbccw.selected_node != null)
                 {
+                    var locking = this.locking;
+                    this.locking = true;
+                    (new CustomCrawlerClusterCapture() { Owner = this }).ShowDialog();
+                    this.locking = locking;
                 }
             }
             else if (e.Key == Key.Add)
@@ -142,6 +147,17 @@ namespace com_crawler.Tool.CustomCrawler
         }
 
         #region Capture & Tree
+
+        public void AppendCapture(string info)
+        {
+            CaptureList.Items.Add(new CustomCrawlerClusterCaptureDataGridItemViewModel
+            {
+                Index = (CaptureList.Items.Count + 1).ToString(),
+                Info = info,
+                DateTime = DateTime.Now.ToString("h:mm ss"),
+                Node = cbccw.selected_node,
+            });
+        }
 
         public void SelectNode(HtmlNode node)
         {

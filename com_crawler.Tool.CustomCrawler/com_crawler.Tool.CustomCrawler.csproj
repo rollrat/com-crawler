@@ -123,6 +123,10 @@
     <Compile Include="CustomCrawlerCAL.xaml.cs">
       <DependentUpon>CustomCrawlerCAL.xaml</DependentUpon>
     </Compile>
+    <Compile Include="CustomCrawlerClusterCapture.xaml.cs">
+      <DependentUpon>CustomCrawlerClusterCapture.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CustomCrawlerClusterCaptureDataGridViewModel.cs" />
     <Compile Include="CustomCrawlerClusterDataGridViewModel.cs" />
     <Compile Include="SeleniumWrapper.cs" />
     <Page Include="CustomCrawler.xaml">
@@ -136,6 +140,10 @@
     <Page Include="CustomCrawlerCluster.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="CustomCrawlerClusterCapture.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="CustomCrawlerDiff.xaml">
       <Generator>MSBuild:Compile</Generator>
