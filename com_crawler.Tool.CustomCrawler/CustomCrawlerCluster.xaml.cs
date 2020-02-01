@@ -13,6 +13,8 @@ using com_crawler.Utils;
 using HtmlAgilityPack;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -319,6 +321,8 @@ namespace com_crawler.Tool.CustomCrawler
         }
 
         string before_find = "";
+        List<(HtmlNode, string)> candidate;
+        Pattern latest_pattern;
         private void FindPatternsOnPage_Click(object sender, RoutedEventArgs e)
         {
             if (PatternList.SelectedItems.Count != 1)
@@ -331,7 +335,8 @@ namespace com_crawler.Tool.CustomCrawler
             make_string(tree.RootNode);
 
             var pattern = PatternList.SelectedItems[0] as CustomCrawlerClusterPatternDataGridItemViewModel;
-            var candidate = new List<(HtmlNode, string)>();
+            candidate = new List<(HtmlNode, string)>();
+            latest_pattern = pattern.Patterns;
 
             if (!AllowRoughly.IsChecked.Value)
             {
@@ -358,14 +363,126 @@ namespace com_crawler.Tool.CustomCrawler
             browser.EvaluateScriptAsync($"document.querySelector('[ccw_tag={candidate[0].Item1.GetAttributeValue("ccw_tag", "")}]').scrollIntoView(true);").Wait();
             before_find = string.Join("", candidate.Select(x => $"document.querySelector('[ccw_tag={x.Item1.GetAttributeValue("ccw_tag", "")}]').style.border = '';"));
 
-            MessageBox.Show($"Found {candidate.Count} three identical patterns!\r\n" + string.Join("\r\n", candidate.Select(x => $"({x.Item2}) {x.Item1.XPath}")), "Cluster", MessageBoxButton.OK, MessageBoxImage.Information);
+            if (!AllowLive.IsChecked.Value)
+                MessageBox.Show($"Found {candidate.Count} identical patterns!\r\n" + string.Join("\r\n", candidate.Select(x => $"({x.Item2}) {x.Item1.XPath}")), "Cluster", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             if (PatternAccuracy != null)
+            {
                 PatternAccuracy.Text = (sender as Slider).Value.ToString("0.0") + "%";
+                if (AllowLive.IsChecked.Value)
+                {
+                    FindPatternsOnPage_Click(null, null);
+                }
+            }
         }
+
+        private void TestFoundElements_Click(object sender, RoutedEventArgs e)
+        {
+            if (candidate == null || candidate.Count <= 1)
+            {
+                MessageBox.Show("There must be at least two candidates. Please run FindPatternsOnPage first or adjust the accuracy.", "Cluster", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            if (MessageBox.Show("This method may differ from what is displayed in the browser because it uses a logical comparison based on the selected candidates. Do you want to continue?", "Cluster", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            {
+                var candidate_lca = tree.GetLCANode(candidate.Select(x => (tree[x.Item1], x.Item1).ToTuple()).ToList());
+
+                if (candidate.Any(x => x.Item1.ParentNode != candidate_lca))
+                {
+                    MessageBox.Show("LCA distance is so far. Please adjust the similarity higher to reduce the range.", "Cluster", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                var builder = new StringBuilder();
+
+                var pattern = latest_pattern;
+
+                builder.Append($"Report for auto-crawling - {DateTime.Now.ToString()}\r\n");
+                builder.Append("This file is automatically created by Community Crawler Project Custom Crawler(CC) Clustering Tool\r\n");
+                builder.Append("Copyright (C) 2020. rollrat. All Rights Reserved.\r\n");
+                builder.Append("\r\n");
+                builder.Append("-- Captures Info remove LCA Prefix --\r\n");
+                pattern.Nodes.ForEach(x => builder.Append($"@{x.Item1} = {x.Item2.XPath.Replace(pattern.LCA.XPath, "")}\r\n"));
+                builder.Append("\r\n");
+                builder.Append("-- Captures Info Origin --\r\n");
+                pattern.Nodes.ForEach(x => builder.Append($"@{x.Item1} = {x.Item2.XPath}\r\n"));
+                builder.Append("\r\n");
+                builder.Append("-- Available Captures Info --\r\n");
+
+                var avc = new Dictionary<HtmlNode, int>();
+                foreach (var cd in candidate)
+                {
+                    foreach (var node in pattern.Nodes)
+                    {
+                        var postfix = node.Item2.XPath.Replace(pattern.LCA.XPath, "");
+                        var nn = cd.Item1.XPath + postfix;
+
+                        var snode = tree.RootNode.SelectSingleNode(nn);
+                        if (snode != null)
+                        {
+                            if (!avc.ContainsKey(node.Item2))
+                                avc.Add(node.Item2, 0);
+                            avc[node.Item2]++;
+                        }
+                    }
+                }
+
+                var hh = avc.ToList().Where(x => x.Value == candidate.Count).Select(x => x.Key).ToHashSet();
+                pattern.Nodes.Where(x => hh.Contains(x.Item2)).ToList().ForEach(x => builder.Append($"@{x.Item1} = {x.Item2.XPath}\r\n"));
+
+                builder.Append("\r\n");
+                builder.Append("-- Pattern Info --\r\n");
+                builder.Append("P-Summary: " + pattern.Info + "\r\n");
+                builder.Append("P-LCA: " + pattern.LCA.XPath + "\r\n");
+                builder.Append("LCA: " + candidate_lca.XPath + "\r\n");
+                builder.Append("\r\n");
+                builder.Append("-- Capture result from Page --\r\n");
+                builder.Append("Count: " + candidate.Count + "\r\n");
+
+                int tc = 0;
+                foreach (var cd in candidate)
+                {
+                    builder.Append("-------------------------\r\n");
+                    builder.Append($"test-case: #{++tc}\r\n");
+                    builder.Append($"tc-lca: {cd.Item1}\r\n");
+                    foreach (var node in pattern.Nodes)
+                    {
+                        var postfix = node.Item2.XPath.Replace(pattern.LCA.XPath, "");
+                        var nn = cd.Item1.XPath + postfix;
+
+                        var snode = tree.RootNode.SelectSingleNode(nn);
+                        if (snode != null)
+                        {
+                            builder.Append($"@{node.Item1} = ");
+                            var tt = snode.InnerText.Trim();
+                            if (tt.Length > 0)
+                                builder.Append($"{snode.InnerText.Trim()}\r\n");
+                            else
+                            {
+                                builder.Append($"/{snode.Name}:");
+                                if (snode.Name == "img")
+                                    builder.Append($"{snode.GetAttributeValue("src", "") + snode.GetAttributeValue("data-src", "")}");
+                                else if (snode.Name == "a")
+                                    builder.Append($"{snode.GetAttributeValue("href", "")}");
+                                else
+                                    builder.Append($"{{{string.Join(" ", snode.Attributes.Select(x => $"{x.Name}=\"{x.Value}\""))}}}");
+                                builder.Append("\r\n");
+                            }
+                        }
+                    }
+                    builder.Append("\r\n");
+                }
+
+                var fn = $"ccpcccct-{DateTime.Now.Ticks}.txt";
+                File.WriteAllText(fn, builder.ToString());
+                Process.Start(fn);
+            }
+        }
+
 
         #endregion
 

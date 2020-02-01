@@ -177,10 +177,11 @@
                         </StackPanel>
                     </Grid>
                 </GroupBox>
-                <GroupBox Header="Patterns" Height="221">
+                <GroupBox Header="Patterns" Height="252">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
@@ -216,8 +217,9 @@
                             </DataGrid.CellStyle>
                         </DataGrid>
                         <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="0 4 0 0" HorizontalAlignment="Right">
+                            <CheckBox x:Name="AllowLive" Content="Live" VerticalAlignment="Center" Margin="0 0 8 0" IsChecked="False"/>
                             <CheckBox x:Name="AllowRoughly" Content="Similarity based Find" VerticalAlignment="Center" Margin="0 0 8 0" IsChecked="True"/>
-                            <Button Content="Find Patterns on Page" Width="200" Click="FindPatternsOnPage_Click"/>
+                            <Button Content="Find Patterns on Page" Width="197" Click="FindPatternsOnPage_Click"/>
                         </StackPanel>
                         <Grid Grid.Row="2" Margin="4 4 4 0" Visibility="{Binding IsChecked,ElementName=AllowRoughly,Converter={StaticResource b2v}}">
                             <Grid.ColumnDefinitions>
@@ -228,8 +230,14 @@
                             <Slider x:Name="AccuracyPattern" Grid.Column="0" ValueChanged="Slider_ValueChanged" Margin="0 0 8 0" Maximum="100" Minimum="0" TickFrequency="0.1" Value="80"/>
                             <TextBlock x:Name="PatternAccuracy" Text="80.0%" Grid.Column="1"/>
                         </Grid>
+                        <StackPanel Orientation="Horizontal" Grid.Row="3" Margin="0 4 0 0" HorizontalAlignment="Right">
+                            <Button Content="Test Found Elements" Width="197" Click="TestFoundElements_Click"/>
+                        </StackPanel>
                     </Grid>
                 </GroupBox>
+                <Border Height="200" BorderThickness="1" Margin="0 8 0 0" BorderBrush="LightGray">
+                    
+                </Border>
             </StackPanel>
         </Grid>
     </Grid>
