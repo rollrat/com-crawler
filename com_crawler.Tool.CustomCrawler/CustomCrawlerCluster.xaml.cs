@@ -503,7 +503,7 @@ namespace com_crawler.Tool.CustomCrawler
 
                 if (tcpattern[0] == '/')
                 {
-                    builder.Append($"    for (int i = 0; ; i++)\r\n");
+                    builder.Append($"    for (int i = 1; ; i++)\r\n");
                     builder.Append("    {\r\n");
                     builder.Append($"        var node = root_node.SelectSingleNode($\"{tcpattern}\");\r\n");
                     builder.Append($"        if (node == null) break;\r\n");
