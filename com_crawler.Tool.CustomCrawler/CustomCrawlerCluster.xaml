@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:com_crawler.Tool.CustomCrawler"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
-        Title="Custom Crawler Cluster" Height="826.49" Width="2154.85">
+        Title="Custom Crawler Cluster" Height="826.49" Width="2311.85">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="b2v" />
     </Window.Resources>
@@ -131,7 +131,7 @@
             HorizontalAlignment="Center"
             VerticalAlignment="Stretch"/>
 
-        <Grid Grid.Column="4" Width="400">
+        <Grid Grid.Column="4" Width="500">
             <StackPanel>
                 <GroupBox Header="CaptureList" Height="300">
                     <Grid>
@@ -154,7 +154,7 @@
                             <DataGrid.Columns>
                                 <materialDesign:MaterialDataGridTextColumn Binding="{Binding Index}" Width="60" Header="Index" ElementStyle="{StaticResource TextBlockStyleKey}"
                                                            EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnPopupEditingStyle}" SortDirection="Descending"/>
-                                <materialDesign:MaterialDataGridTextColumn Binding="{Binding Info}" Width="200" Header="Info" ElementStyle="{StaticResource TextBlockStyleKey}"
+                                <materialDesign:MaterialDataGridTextColumn Binding="{Binding Info}" Width="250" Header="Info" ElementStyle="{StaticResource TextBlockStyleKey}"
                                                            EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnPopupEditingStyle}"/>
                                 <materialDesign:MaterialDataGridTextColumn Binding="{Binding DateTime}" Width="120" Header="DateTime" ElementStyle="{StaticResource TextBlockStyleKey}"
                                                            EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnPopupEditingStyle}"/>
@@ -200,7 +200,7 @@
                             <DataGrid.Columns>
                                 <materialDesign:MaterialDataGridTextColumn Binding="{Binding Index}" Width="60" Header="Index" ElementStyle="{StaticResource TextBlockStyleKey}"
                                                            EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnPopupEditingStyle}" SortDirection="Descending"/>
-                                <materialDesign:MaterialDataGridTextColumn Binding="{Binding Pattern}" Width="310" Header="Pattern" ElementStyle="{StaticResource TextBlockStyleKey}"
+                                <materialDesign:MaterialDataGridTextColumn Binding="{Binding Pattern}" Width="400" Header="Pattern" ElementStyle="{StaticResource TextBlockStyleKey}"
                                                            EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnPopupEditingStyle}"/>
                             </DataGrid.Columns>
                             <DataGrid.CellStyle>
@@ -235,8 +235,25 @@
                         </StackPanel>
                     </Grid>
                 </GroupBox>
-                <Border Height="200" BorderThickness="1" Margin="0 8 0 0" BorderBrush="LightGray">
-                    
+                <Border Height="194" BorderThickness="1" Margin="0 8 0 0" BorderBrush="LightGray">
+
+                    <Grid Grid.Column="0" Margin="4">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Text="XPath: " Grid.Row="0" Grid.Column="0" FontSize="15" VerticalAlignment="Center"/>
+                        <TextBox x:Name="CurrentXPath" Grid.Row="0" Grid.Column="1" FontSize="15"/>
+                        
+                        <TextBlock Text="Code: " Grid.Row="1" Grid.Column="0" Margin="0 4 0 0" FontSize="15" VerticalAlignment="Top" HorizontalAlignment="Right"/>
+                        <TextBox x:Name="CurrentCode" Grid.Row="1" Grid.Column="1" Margin="0 4 0 0" FontSize="15" AcceptsReturn="True" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Auto"/>
+                    </Grid>
                 </Border>
             </StackPanel>
         </Grid>

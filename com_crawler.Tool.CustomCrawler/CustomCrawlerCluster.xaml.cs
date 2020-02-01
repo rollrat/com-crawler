@@ -391,7 +391,16 @@ namespace com_crawler.Tool.CustomCrawler
             {
                 var candidate_lca = tree.GetLCANode(candidate.Select(x => (tree[x.Item1], x.Item1).ToTuple()).ToList());
 
-                if (candidate.Any(x => x.Item1.ParentNode != candidate_lca))
+                Func<HtmlNode, int> distance = (HtmlNode x) =>
+                {
+                    int parent_distance = 0;
+                    for (var nn = x; nn == candidate_lca; nn = nn.ParentNode, parent_distance++) ;
+                    return parent_distance;
+                };
+
+                var sdist = distance(candidate[0].Item1);
+
+                if (candidate.Any(x => distance(x.Item1) != sdist))
                 {
                     MessageBox.Show("LCA distance is so far. Please adjust the similarity higher to reduce the range.", "Cluster", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
@@ -477,12 +486,160 @@ namespace com_crawler.Tool.CustomCrawler
                     builder.Append("\r\n");
                 }
 
+                builder.Append("-- Test-case Patterns --\r\n");
+                var tcpattern = extract_pattern(candidate.Select(x => x.Item1.XPath).ToList());
+                builder.Append("Pattern: " + tcpattern + "\r\n");
+                builder.Append("public class Pattern\r\n");
+                builder.Append("{\r\n");
+                pattern.Nodes.ForEach(x => builder.Append($"    public string {x.Item1};\r\n"));
+                builder.Append("}\r\n");
+                builder.Append("\r\n");
+                builder.Append("public Pattern Extract(string html)\r\n");
+                builder.Append("{\r\n");
+                builder.Append("    HtmlDocument document = new HtmlDocument();\r\n");
+                builder.Append("    document.LoadHtml(html);\r\n");
+                builder.Append("    var result = new Pattern();\r\n");
+                builder.Append("    var root_node = document.DocumentNode;\r\n");
+
+                if (tcpattern[0] == '/')
+                {
+                    builder.Append($"    for (int i = 0; ; i++)\r\n");
+                    builder.Append("    {\r\n");
+                    builder.Append($"        var node = root_node.SelectSingleNode($\"{tcpattern}\");\r\n");
+                    builder.Append($"        if (node == null) break;\r\n");
+                    foreach (var pp in pattern.Nodes)
+                    {
+                        var postfix = pp.Item2.XPath.Replace(pattern.LCA.XPath, "");
+                        if (hh.Contains(pp.Item2))
+                        {
+                            builder.Append($"        result.{pp.Item1} = node.SelectSingleNode(\".{postfix}\").InnerText;\r\n");
+                        }
+                        else
+                        {
+                            builder.Append($"        if (node.SelectSingleNode(\".{postfix}\") != null)\r\n");
+                            builder.Append($"            result.{pp.Item1} = node.SelectSingleNode(\".{postfix}\").InnerText;\r\n");
+                        }
+                    }
+                    builder.Append($"        \r\n");
+                    builder.Append("    }\r\n");
+                }
+                else
+                {
+
+                }
+
+                builder.Append("}\r\n");
+
+
                 var fn = $"ccpcccct-{DateTime.Now.Ticks}.txt";
                 File.WriteAllText(fn, builder.ToString());
                 Process.Start(fn);
             }
         }
 
+        private List<string> parse_pattern_string(string pp)
+        {
+            var tokens = new List<string>();
+
+            for (int i = 0; i < pp.Length; i++)
+            {
+                var builder = new StringBuilder();
+                builder.Append(pp[i]);
+                if (char.IsNumber(pp[i]))
+                {
+                    while (i < pp.Length - 1 && char.IsNumber(pp[i + 1]))
+                        builder.Append(pp[++i]);
+                }
+                else
+                {
+                    while (i < pp.Length - 1 && !char.IsNumber(pp[i + 1]))
+                        builder.Append(pp[++i]);
+                }
+                tokens.Add(builder.ToString());
+            }
+
+            return tokens;
+        }
+
+        private List<bool> classify_tokens(List<string> tokens)
+        {
+            var isnum = new List<bool>(tokens.Count);
+            tokens.ForEach(x =>
+            {
+                int nn;
+                if (int.TryParse(x, out nn))
+                    isnum.Add(true);
+                else
+                    isnum.Add(false);
+            });
+            return isnum;
+        }
+
+        private string extract_pattern(List<string> list)
+        {
+            if (list.Count < 3) return "At least 3 inputs are required.";
+            list.Sort(new Strings.NaturalComparer());
+            var std = parse_pattern_string(list[0]);
+            var fix = classify_tokens(std);
+            var tokens = list.Select(x => parse_pattern_string(x)).ToList();
+            var classes = tokens.Select(x => classify_tokens(x)).ToList();
+
+            for (int i = 0; i < std.Count; i++)
+            {
+                if (!classes[0][i])
+                {
+                    for (int j = 0; j < classes.Count; j++)
+                        if (classes[j].Count != classes[0].Count || tokens[j][i] != tokens[0][i])
+                            return "Pattern Not Found.";
+                }
+            }
+
+            var numbers = new List<List<int>>();
+            for (int i = 0; i < fix.Count; i++)
+            {
+                if (fix[i])
+                {
+                    if (tokens[0][i] == tokens[1][i])
+                    {
+                        fix[i] = false;
+                        continue;
+                    }
+
+                    numbers.Add(tokens.Select(x => Convert.ToInt32(x[i])).ToList());
+                }
+            }
+
+            var pattern = new List<string>();
+            for (int i = 0; i < numbers.Count; i++)
+            {
+                int a = numbers[i][0];
+                int b = numbers[i][1];
+                int c = numbers[i][2];
+
+                if (c - b == b - a)
+                {
+                    if (a == 0)
+                        pattern.Add($"i*{c - b}");
+                    else
+                        pattern.Add($"{a}+i*{c - b}");
+                }
+                else
+                {
+                    return "Patterns must be linear increment functions.";
+                }
+            }
+
+            var builder = new StringBuilder();
+            for (int i = 0, j = 0; i < fix.Count; i++)
+            {
+                if (fix[i])
+                    builder.Append("{" + pattern[j++] + "}");
+                else
+                    builder.Append(std[i]);
+            }
+
+            return builder.ToString();
+        }
 
         #endregion
 
@@ -528,6 +685,17 @@ namespace com_crawler.Tool.CustomCrawler
                         before = $"ccw_tag=ccw_{i}_{j}";
                         before_border = instance.browser.EvaluateScriptAsync($"document.querySelector('[{before}]').style.border").Result.Result.ToString();
                         instance.browser.EvaluateScriptAsync($"document.querySelector('[{before}]').style.border = '0.2em solid red';").Wait();
+                        instance.CurrentXPath.Text = selected_node.XPath;
+
+                        var builder = new StringBuilder();
+                        builder.Append("public HtmlNode Extract(string html)\r\n");
+                        builder.Append("{\r\n");
+                        builder.Append("    HtmlDocument document = new HtmlDocument();\r\n");
+                        builder.Append("    document.LoadHtml(html);\r\n");
+                        builder.Append($"    return document.DocumentNode.SelectSingleNode(\"{selected_node.XPath}\");\r\n");
+                        builder.Append("}\r\n");
+
+                        instance.CurrentCode.Text = builder.ToString();
                     }
                     catch { }
                 }));
