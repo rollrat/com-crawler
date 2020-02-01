@@ -448,7 +448,7 @@ namespace com_crawler.Tool.CustomCrawler
                 {
                     builder.Append("-------------------------\r\n");
                     builder.Append($"test-case: #{++tc}\r\n");
-                    builder.Append($"tc-lca: {cd.Item1}\r\n");
+                    builder.Append($"tc-lca: {cd.Item1.XPath}\r\n");
                     foreach (var node in pattern.Nodes)
                     {
                         var postfix = node.Item2.XPath.Replace(pattern.LCA.XPath, "");
