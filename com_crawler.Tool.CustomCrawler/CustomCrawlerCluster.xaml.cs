@@ -346,13 +346,17 @@ namespace com_crawler.Tool.CustomCrawler
             }
             else
             {
-                foreach (var pp in msdp)
+                var value = AccuracyPattern.Value;
+                Parallel.ForEach(msdp, pp =>
                 {
                     var distance = Strings.ComputeLevenshteinDistance(pp.Value, pattern.Patterns.Content);
                     var per = 100.0 - distance / (double)Math.Max(pp.Value.Length, pattern.Patterns.Content.Length) * 100.0;
-                    if (per >= AccuracyPattern.Value)
-                        candidate.Add((pp.Key, per.ToString("0.0") + "%"));
-                }
+                    if (per >= value)
+                    {
+                        lock(candidate)
+                            candidate.Add((pp.Key, per.ToString("0.0") + "%"));
+                    }
+                });
             }
 
             var builder = new StringBuilder();
