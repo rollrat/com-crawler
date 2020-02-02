@@ -44,7 +44,6 @@ namespace com_crawler.Tool.CustomCrawler
         {
             InitializeComponent();
 
-            //Cef.Initialize(new CefSettings());
             browser = new ChromiumWebBrowser(string.Empty);
             browserContainer.Content = browser;
             browser.IsBrowserInitializedChanged += Browser_IsBrowserInitializedChanged;
@@ -75,7 +74,49 @@ namespace com_crawler.Tool.CustomCrawler
                 }
             }
 
+            //inject_debug(tree.RootNode);
+
             KeyDown += CustomCrawlerCluster_KeyDown;
+        }
+
+        private void inject_debug(HtmlNode node)
+        {
+            var code = new StringBuilder();
+
+            code.Append(@"
+<script>
+if ('serviceWorker' in navigator) {
+    //ccw.hhh('Service worker is supported!');
+  navigator.serviceWorker.register('https://github.com/rr/sw.js')
+  .then(function(reg) {
+    // registration worked
+    console.log('Registration succeeded. Scope is ' + reg.scope);
+  }).catch(function(error) {
+    // registration failed
+    console.log('Registration failed with ' + error);
+    ccw.hhh(error.message);
+  });
+}
+
+navigator.serviceWorker.addEventListener('fetch', event => {
+  event.respondWith(async function(e) {
+    //const cachedResponse = await caches.match(event.request);
+    //if (cachedResponse) return cachedResponse;
+    var err = new Error();
+    ccw.hhh(err.stack);
+    //return err.stack;
+    //return fetch(event.request);
+  }());
+});
+
+window.addEventListener('load', () => {
+    ccw.hhh('xx');
+});
+</script>
+");
+
+            var body = node.SelectSingleNode("//html");
+            body.ChildNodes.Insert(0, HtmlNode.CreateNode(code.ToString()));
         }
 
         private void Browser_IsBrowserInitializedChanged(object sender, DependencyPropertyChangedEventArgs e)

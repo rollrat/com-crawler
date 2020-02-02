@@ -27,6 +27,7 @@ using System.Windows.Shapes;
 using com_crawler.Html;
 using CefSharp;
 using CefSharp.Wpf;
+using CefSharp.Callback;
 
 namespace com_crawler.Tool.CustomCrawler
 {
@@ -36,9 +37,75 @@ namespace com_crawler.Tool.CustomCrawler
         {
             InitializeComponent();
 
-            Cef.Initialize(new CefSettings());
+            CefSettings set = new CefSettings();
+            //set.RegisterScheme(new CefCustomScheme()
+            //{
+            //    SchemeName = "http",
+            //    SchemeHandlerFactory = new CefSharpSchemeHandlerFactory()
+            //});
+            //set.RegisterScheme(new CefCustomScheme()
+            //{
+            //    SchemeName = "https",
+            //    SchemeHandlerFactory = new CefSharpSchemeHandlerFactory()
+            //});
+            //Cef.Initialize(new CefSettings());
+            Cef.Initialize(set);
             HTMLList.DataContext = new CustomCrawlerDataGridViewModel();
             HTMLList.Sorting += new DataGridSortingEventHandler(new DataGridSorter<CustomCrawlerDataGridItemViewModel>(HTMLList).SortHandler);
+        }
+
+        internal class CefSharpSchemeHandlerFactory : ISchemeHandlerFactory
+        {
+            public const string SchemeName = "http";
+
+            public IResourceHandler Create(IBrowser browser, IFrame frame, string schemeName, IRequest request)
+            {
+                return new CefSharpSchemeHandler();
+            }
+        }
+
+        internal class CefSharpSchemeHandler : IResourceHandler
+        {
+            public void Cancel()
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Dispose()
+            {
+                throw new NotImplementedException();
+            }
+
+            public void GetResponseHeaders(IResponse response, out long responseLength, out string redirectUrl)
+            {
+                throw new NotImplementedException();
+            }
+
+            public bool Open(IRequest request, out bool handleRequest, ICallback callback)
+            {
+                var pd = request.PostData;
+                throw new NotImplementedException();
+            }
+
+            public bool ProcessRequest(IRequest request, ICallback callback)
+            {
+                throw new NotImplementedException();
+            }
+
+            public bool Read(Stream dataOut, out int bytesRead, IResourceReadCallback callback)
+            {
+                throw new NotImplementedException();
+            }
+
+            public bool ReadResponse(Stream dataOut, out int bytesRead, ICallback callback)
+            {
+                throw new NotImplementedException();
+            }
+
+            public bool Skip(long bytesToSkip, out long bytesSkipped, IResourceSkipCallback callback)
+            {
+                throw new NotImplementedException();
+            }
         }
 
         HtmlTree tree;
