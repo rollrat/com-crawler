@@ -11,11 +11,13 @@ using CefSharp.Wpf;
 using com_crawler.Html;
 using com_crawler.Utils;
 using HtmlAgilityPack;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -74,49 +76,7 @@ namespace com_crawler.Tool.CustomCrawler
                 }
             }
 
-            //inject_debug(tree.RootNode);
-
             KeyDown += CustomCrawlerCluster_KeyDown;
-        }
-
-        private void inject_debug(HtmlNode node)
-        {
-            var code = new StringBuilder();
-
-            code.Append(@"
-<script>
-if ('serviceWorker' in navigator) {
-    //ccw.hhh('Service worker is supported!');
-  navigator.serviceWorker.register('https://github.com/rr/sw.js')
-  .then(function(reg) {
-    // registration worked
-    console.log('Registration succeeded. Scope is ' + reg.scope);
-  }).catch(function(error) {
-    // registration failed
-    console.log('Registration failed with ' + error);
-    ccw.hhh(error.message);
-  });
-}
-
-navigator.serviceWorker.addEventListener('fetch', event => {
-  event.respondWith(async function(e) {
-    //const cachedResponse = await caches.match(event.request);
-    //if (cachedResponse) return cachedResponse;
-    var err = new Error();
-    ccw.hhh(err.stack);
-    //return err.stack;
-    //return fetch(event.request);
-  }());
-});
-
-window.addEventListener('load', () => {
-    ccw.hhh('xx');
-});
-</script>
-");
-
-            var body = node.SelectSingleNode("//html");
-            body.ChildNodes.Insert(0, HtmlNode.CreateNode(code.ToString()));
         }
 
         private void Browser_IsBrowserInitializedChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -209,6 +169,10 @@ window.addEventListener('load', () => {
                         refresh_marking();
                     }
                 }
+            }
+            else if (e.Key == Key.F12)
+            {
+                connect_devtools();
             }
         }
 
@@ -917,6 +881,57 @@ window.addEventListener('load', () => {
                     Header = $"{rr[i].Item1.ToString("#,0")} ({(rr[i].Item1 / (double)max_area * 100.0).ToString("#0.0")} %)",
                     Node = rr[i].Item5
                 });
+            }
+        }
+
+        #endregion
+
+        #region WebSocket Connector
+
+        private long GetTime()
+        {
+            long retval = 0;
+            var st = new DateTime(1970, 1, 1);
+            TimeSpan t = (DateTime.Now.ToUniversalTime() - st);
+            retval = (long)(t.TotalMilliseconds + 0.5);
+            return retval;
+        }
+
+        private void connect_devtools()
+        {
+            var list = Network.NetCommon.DownloadString("http://localhost:8088/json/list?t=" + GetTime());
+            var ws = JArray.Parse(list)[0]["webSocketDebuggerUrl"];
+
+            Task.Run(async () =>
+            {
+                var wss = new ClientWebSocket();
+                await wss.ConnectAsync(new Uri(ws.ToString()), CancellationToken.None);
+                await Task.WhenAll(Send(wss), Receive(wss));
+            });
+
+        }
+
+        private static async Task Send(ClientWebSocket webSocket)
+        {
+            byte[] buffer = Encoding.UTF8.GetBytes("{\"id\":1,\"method\":\"Network.enable\",\"params\":{\"maxPostDataSize\":65536}}");
+            await webSocket.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Text, true, CancellationToken.None);
+        }
+
+        private static async Task Receive(ClientWebSocket webSocket)
+        {
+            byte[] buffer = new byte[65535];
+            while (webSocket.State == WebSocketState.Open)
+            {
+                var result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                if (result.MessageType == WebSocketMessageType.Close)
+                {
+                    await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
+                }
+                else
+                {
+                    var content = Encoding.UTF8.GetString(buffer);
+                    //LogStatus(true, buffer, result.Count);
+                }
             }
         }
 
