@@ -16,7 +16,7 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using com_crawler.Tool.CustomCrawler.chrome_devtools.Response;
+using com_crawler.Tool.CustomCrawler.chrome_devtools.Response.Network;
 
 namespace com_crawler.Tool.CustomCrawler.chrome_devtools
 {
@@ -36,6 +36,11 @@ namespace com_crawler.Tool.CustomCrawler.chrome_devtools
         public string Url { get; set; }
         [JsonProperty(PropertyName = "webSocketDebuggerUrl")]
         public string WebSocketDebuggerUrl { get; set; }
+    }
+
+    public class ChromeDevtoolsOptions
+    {
+        public const string Network = "{\"id\":1,\"method\":\"Network.enable\",\"params\":{\"maxPostDataSize\":65536}}";
     }
 
     /// <summary>
@@ -70,6 +75,7 @@ namespace com_crawler.Tool.CustomCrawler.chrome_devtools
 
         ChromeDevtoolsListElement target;
         ClientWebSocket wss;
+        int id_count = 0;
 
         public ChromeDevtoolsEnvironment(ChromeDevtoolsListElement target_info)
         {
@@ -89,7 +95,7 @@ namespace com_crawler.Tool.CustomCrawler.chrome_devtools
         {
             await Task.WhenAll(Task.Run(async () =>
             {
-                await send("{\"id\":1,\"method\":\"Network.enable\",\"params\":{\"maxPostDataSize\":65536}}");
+                await send(ChromeDevtoolsOptions.Network);
             }),
 
             Task.Run(async () =>
@@ -120,13 +126,15 @@ namespace com_crawler.Tool.CustomCrawler.chrome_devtools
 
                             }
                         }
-                        catch (Exception e)
-                        {
-                            ;
-                        }
+                        catch { }
                     }
                 }
             }));
+        }
+
+        public void Send(ChromeDevtoolsResponse what)
+        {
+
         }
 
         private async Task send(string content)
