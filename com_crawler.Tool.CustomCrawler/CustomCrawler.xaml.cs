@@ -40,6 +40,16 @@ namespace com_crawler.Tool.CustomCrawler
 
             CefSettings set = new CefSettings();
             ChromeDevtoolsEnvironment.Settings(ref set);
+            set.RegisterScheme(new CefCustomScheme()
+            {
+                SchemeName = "http",
+                SchemeHandlerFactory = new CefSharpSchemeHandlerFactory()
+            });
+            set.RegisterScheme(new CefCustomScheme()
+            {
+                SchemeName = "https",
+                SchemeHandlerFactory = new CefSharpSchemeHandlerFactory()
+            });
             Cef.Initialize(set);
             HTMLList.DataContext = new CustomCrawlerDataGridViewModel();
             HTMLList.Sorting += new DataGridSortingEventHandler(new DataGridSorter<CustomCrawlerDataGridItemViewModel>(HTMLList).SortHandler);
@@ -49,6 +59,10 @@ namespace com_crawler.Tool.CustomCrawler
         {
             public IResourceHandler Create(IBrowser browser, IFrame frame, string schemeName, IRequest request)
             {
+                if (request.Url.EndsWith(".js") && !JsManager.Instance.Contains(request.Url))
+                {
+                    JsManager.Instance.Register(request.Url, NetCommon.DownloadString(request.Url));
+                }
                 return null;
             }
         }
@@ -479,7 +493,7 @@ namespace com_crawler.Tool.CustomCrawler
 
         private void Diff_Click(object sender, RoutedEventArgs e)
         {
-
+            new CustomCrawlerDiff().Show();
         }
 
         private void Cluster_Click(object sender, RoutedEventArgs e)

@@ -7,6 +7,8 @@
 ***/
 
 using CefSharp.Wpf;
+using com_crawler.Tool.CustomCrawler.chrome_devtools.Event;
+using com_crawler.Tool.CustomCrawler.chrome_devtools.Event.Network;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -16,7 +18,6 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using com_crawler.Tool.CustomCrawler.chrome_devtools.Response.Network;
 
 namespace com_crawler.Tool.CustomCrawler.chrome_devtools
 {
@@ -38,6 +39,22 @@ namespace com_crawler.Tool.CustomCrawler.chrome_devtools
         public string WebSocketDebuggerUrl { get; set; }
     }
 
+    public class ChromeDevtoolsResponse
+    {
+        public string RawMessage { get; set; }
+
+        [JsonProperty(PropertyName = "id")]
+        public object Id { get; set; }
+        [JsonProperty(PropertyName = "result")]
+        public object Result { get; set; }
+        [JsonProperty(PropertyName = "method")]
+        public object Method { get; set; }
+        [JsonProperty(PropertyName = "params")]
+        public object Params { get; set; }
+        [JsonProperty(PropertyName = "error")]
+        public object Error { get; set; }
+    }
+
     public class ChromeDevtoolsOptions
     {
         public const string Network = "{\"id\":1,\"method\":\"Network.enable\",\"params\":{\"maxPostDataSize\":65536}}";
@@ -49,6 +66,7 @@ namespace com_crawler.Tool.CustomCrawler.chrome_devtools
     public class ChromeDevtoolsEnvironment : IDisposable
     {
         public static int Port = 8087;
+        Timer timer;
 
         public static void Settings(ref CefSettings settings)
         {
@@ -75,13 +93,19 @@ namespace com_crawler.Tool.CustomCrawler.chrome_devtools
 
         ChromeDevtoolsListElement target;
         ClientWebSocket wss;
-        int id_count = 0;
+        int id_count = 2;
 
         public ChromeDevtoolsEnvironment(ChromeDevtoolsListElement target_info)
         {
             target = target_info;
 
             wss = new ClientWebSocket();
+            timer = new Timer(timer_callback, null, 0, 500);
+        }
+
+        private void timer_callback(object obj)
+        {
+            Task.Run(async () => await send($"{{\"id\":{id_count++}}}"));
         }
 
         public async Task Connect()
@@ -89,7 +113,8 @@ namespace com_crawler.Tool.CustomCrawler.chrome_devtools
             await wss.ConnectAsync(new Uri(target.WebSocketDebuggerUrl), CancellationToken.None);
         }
 
-        List<ChromeDevtoolsResponse> response = new List<ChromeDevtoolsResponse>();
+
+        Dictionary<string, List<object>> events = new Dictionary<string, List<object>>();
 
         public async Task Start()
         {
@@ -100,10 +125,10 @@ namespace com_crawler.Tool.CustomCrawler.chrome_devtools
 
             Task.Run(async () =>
             {
-                var construct = "";
+                var construct = new StringBuilder();
+                byte[] buffer = new byte[65535];
                 while (wss.State == WebSocketState.Open)
                 {
-                    byte[] buffer = new byte[65535];
                     var result = await wss.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
                     if (result.MessageType == WebSocketMessageType.Close)
                     {
@@ -111,30 +136,41 @@ namespace com_crawler.Tool.CustomCrawler.chrome_devtools
                     }
                     else
                     {
-                        var content = Encoding.UTF8.GetString(buffer);
-                        construct += content;
+                        var content = Encoding.UTF8.GetString(buffer, 0, result.Count);
+                        construct.Append(content);
                         try
                         {
-                            var response = JsonConvert.DeserializeObject<ChromeDevtoolsResponse>(construct);
+                            var response = JsonConvert.DeserializeObject<ChromeDevtoolsResponse>(construct.ToString());
                             response.RawMessage = content;
-                            this.response.Add(response);
-                            construct = "";
+                            construct.Clear();
 
                             if (response.Method != null && response.Method.ToString() == "Network.requestWillBeSent")
                             {
                                 var xx = JsonConvert.DeserializeObject<RequestWillBeSent>(response.Params.ToString());
-
+                                raise_event("RequestWillBeSent", xx);
                             }
+                            else if (response.Method != null && response.Method.ToString() == "Network.requestWillBeSentExtraInfo")
+                            {
+                                var xx = JsonConvert.DeserializeObject<RequestWillBeSentExtraInfo>(response.Params.ToString());
+                                raise_event("RequestWillBeSentExtraInfo", xx);
+                            }
+                            else if (response.Method != null && response.Method.ToString() == "Network.responseReceived")
+                            {
+                                var xx = JsonConvert.DeserializeObject<ResponseReceived>(response.Params.ToString());
+                                raise_event("ResponseReceived", xx);
+                            }
+                            else if (response.Method != null && response.Method.ToString() == "Network.responseReceivedExtraInfo")
+                            {
+                                var xx = JsonConvert.DeserializeObject<RequestWillBeSent>(response.Params.ToString());
+                                raise_event("ResponseReceivedExtraInfo", xx);
+                            }
+
+                            // ignore other events
                         }
                         catch { }
                     }
                 }
             }));
-        }
-
-        public void Send(ChromeDevtoolsResponse what)
-        {
-
         }
 
         private async Task send(string content)
@@ -143,9 +179,38 @@ namespace com_crawler.Tool.CustomCrawler.chrome_devtools
             await wss.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Text, true, CancellationToken.None);
         }
 
+        private void raise_event<T>(string what, T obj)
+        {
+            if (events.ContainsKey(what))
+            {
+                var ll = events[what];
+                ll.ForEach(x => (x as Action<T>).Invoke(obj));
+            }
+        }
+
+        string[] events_list = new[] { "RequestWillBeSent", "RequestWillBeSentExtraInfo", "ResponseReceived", "ResponseReceivedExtraInfo" };
+
+        public void Subscribe<T>(Action<T> callback)
+        {
+            foreach (var event_name in events_list)
+            {
+                if (typeof(T).Name == event_name)
+                {
+                    if (!events.ContainsKey(event_name))
+                        events.Add(event_name, new List<object>());
+                    events[event_name].Add(callback);
+                }
+            }
+        }
+
+        public void Send(ChromeDevtoolsResponse what)
+        {
+        }
+
         public void Dispose()
         {
             wss.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None).Wait();
+            timer.Dispose();
         }
     }
 }

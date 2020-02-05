@@ -14,7 +14,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace com_crawler.Tool.CustomCrawler.chrome_devtools.Request.Network
+namespace com_crawler.Tool.CustomCrawler.chrome_devtools.Method.Network
 {
     public class GetCookies
     {

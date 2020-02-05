@@ -52,11 +52,20 @@ namespace com_crawler.Tool.CustomCrawler
         {
             browser.Load(URLText.Text);
 
-            var target = ChromeDevtoolsEnvironment.GetDebuggeeList().Where(x => x.Url == URLText.Text);
-            env = ChromeDevtoolsEnvironment.CreateInstance(target.First());
+            if (env == null)
+            {
+                var target = ChromeDevtoolsEnvironment.GetDebuggeeList().Where(x => x.Url == URLText.Text);
 
-            await env.Connect();
-            await env.Start();
+                if (target.Count() == 0)
+                    return;
+
+                env = ChromeDevtoolsEnvironment.CreateInstance(target.First());
+
+                new CustomCrawlerDynamicsRequest(env).Show();
+
+                await env.Connect();
+                await env.Start();
+            }
         }
     }
 }

@@ -165,15 +165,22 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="chrome-devtools\ChromeDevtoolsEnvironment.cs" />
-    <Compile Include="chrome-devtools\Response\CallFrame.cs" />
-    <Compile Include="chrome-devtools\Response\CommonResponse.cs" />
-    <Compile Include="chrome-devtools\Response\Initiator.cs" />
-    <Compile Include="chrome-devtools\Response\Request.cs" />
-    <Compile Include="chrome-devtools\Response\RequestWillBeSent.cs" />
-    <Compile Include="chrome-devtools\Response\ResourceTiming.cs" />
-    <Compile Include="chrome-devtools\Response\Response.cs" />
-    <Compile Include="chrome-devtools\Response\SecurityDetails.cs" />
-    <Compile Include="chrome-devtools\Response\StackTrace.cs" />
+    <Compile Include="chrome-devtools\Event\Network\ResponseReceived.cs" />
+    <Compile Include="chrome-devtools\Event\Network\ResponseReceivedExtraInfo.cs" />
+    <Compile Include="chrome-devtools\Method\Network\Enable.cs" />
+    <Compile Include="chrome-devtools\Method\Network\GetCookies.cs" />
+    <Compile Include="chrome-devtools\Types\Network\CallFrame.cs" />
+    <Compile Include="chrome-devtools\Event\CommonResponse.cs" />
+    <Compile Include="chrome-devtools\Types\Network\Initiator.cs" />
+    <Compile Include="chrome-devtools\Types\Network\Request.cs" />
+    <Compile Include="chrome-devtools\Event\Network\RequestWillBeSent.cs" />
+    <Compile Include="chrome-devtools\Event\Network\RequestWillBeSentExtraInfo.cs" />
+    <Compile Include="chrome-devtools\Types\Network\ResourceTiming.cs" />
+    <Compile Include="chrome-devtools\Types\Network\Response.cs" />
+    <Compile Include="chrome-devtools\Types\Network\SecurityDetails.cs" />
+    <Compile Include="chrome-devtools\Types\Network\StackTrace.cs" />
+    <Compile Include="chrome-devtools\Types\Network\BlockedCookieWithReason.cs" />
+    <Compile Include="chrome-devtools\Types\Network\Cookie.cs" />
     <Compile Include="CustomCrawler.xaml.cs">
       <DependentUpon>CustomCrawler.xaml</DependentUpon>
     </Compile>
@@ -189,6 +196,11 @@
     <Compile Include="CustomCrawlerDynamics.xaml.cs">
       <DependentUpon>CustomCrawlerDynamics.xaml</DependentUpon>
     </Compile>
+    <Compile Include="CustomCrawlerDynamicsRequest.xaml.cs">
+      <DependentUpon>CustomCrawlerDynamicsRequest.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CustomCrawlerDynamicsRequestDataGridViewModel.cs" />
+    <Compile Include="JsManager.cs" />
     <Compile Include="SeleniumWrapper.cs" />
     <Page Include="CustomCrawler.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -211,6 +223,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="CustomCrawlerDynamics.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="CustomCrawlerDynamicsRequest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
