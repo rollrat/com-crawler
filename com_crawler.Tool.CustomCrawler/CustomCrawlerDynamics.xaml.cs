@@ -39,33 +39,36 @@ namespace com_crawler.Tool.CustomCrawler
 
             browser = new ChromiumWebBrowser(string.Empty);
             browserContainer.Content = browser;
-            browser.IsBrowserInitializedChanged += Browser_IsBrowserInitializedChanged; ;
+
+            Closed += CustomCrawlerDynamics_Closed;
         }
 
-        private void Browser_IsBrowserInitializedChanged(object sender, DependencyPropertyChangedEventArgs e)
+        private void CustomCrawlerDynamics_Closed(object sender, EventArgs e)
         {
+            if (env != null)
+                env.Dispose();
         }
 
         ChromeDevtoolsEnvironment env;
 
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
-            browser.Load(URLText.Text);
-
             if (env == null)
             {
-                var target = ChromeDevtoolsEnvironment.GetDebuggeeList().Where(x => x.Url == URLText.Text);
+                var token = new Random().Next();
+                browser.LoadHtml(token.ToString());
 
-                if (target.Count() == 0)
-                    return;
-
+                var target = ChromeDevtoolsEnvironment.GetDebuggeeList().Where(x => x.Title == $"data:text/html,{token}");
                 env = ChromeDevtoolsEnvironment.CreateInstance(target.First());
-
                 new CustomCrawlerDynamicsRequest(env).Show();
 
                 await env.Connect();
-                await env.Start();
+                await env.Option();
+
+                _ = Task.Run(async () => { await env.Start(); });
             }
+
+            browser.Load(URLText.Text);
         }
     }
 }

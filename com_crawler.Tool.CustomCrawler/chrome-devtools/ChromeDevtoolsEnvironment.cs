@@ -113,17 +113,16 @@ namespace com_crawler.Tool.CustomCrawler.chrome_devtools
             await wss.ConnectAsync(new Uri(target.WebSocketDebuggerUrl), CancellationToken.None);
         }
 
+        public async Task Option()
+        {
+            await send(ChromeDevtoolsOptions.Network);
+        }
 
         Dictionary<string, List<object>> events = new Dictionary<string, List<object>>();
 
         public async Task Start()
         {
-            await Task.WhenAll(Task.Run(async () =>
-            {
-                await send(ChromeDevtoolsOptions.Network);
-            }),
-
-            Task.Run(async () =>
+            await Task.Run(async () =>
             {
                 var construct = new StringBuilder();
                 byte[] buffer = new byte[65535];
@@ -170,7 +169,7 @@ namespace com_crawler.Tool.CustomCrawler.chrome_devtools
                         catch { }
                     }
                 }
-            }));
+            });
         }
 
         private async Task send(string content)
@@ -209,8 +208,12 @@ namespace com_crawler.Tool.CustomCrawler.chrome_devtools
 
         public void Dispose()
         {
-            wss.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None).Wait();
-            timer.Dispose();
+            if (wss != null)
+            {
+                wss.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None).Wait();
+                wss = null;
+                timer.Dispose();
+            }
         }
     }
 }

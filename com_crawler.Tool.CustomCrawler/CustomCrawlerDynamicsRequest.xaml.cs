@@ -1,5 +1,13 @@
-﻿using com_crawler.Tool.CustomCrawler.chrome_devtools;
-using com_crawler.Tool.CustomCrawler.chrome_devtools.Response.Network;
+﻿/***
+
+   Copyright (C) 2020. rollrat. All Rights Reserved.
+   
+   Author: Community Crawler Developer
+
+***/
+
+using com_crawler.Tool.CustomCrawler.chrome_devtools;
+using com_crawler.Tool.CustomCrawler.chrome_devtools.Event.Network;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,9 +46,26 @@ namespace com_crawler.Tool.CustomCrawler
                     (RequestList.DataContext as CustomCrawlerDynamicsRequestDataGridViewModel).Items.Add(new CustomCrawlerDynamicsRequestDataGridItemViewModel
                     {
                         Id = (++index_count).ToString(),
+                        Type = "Request",
                         Url = x.Request.Url,
-                        Type = x.ResourceType,
+                        ContentType = x.ResourceType,
                         Request = x
+                    });
+                }));
+            });
+
+            env.Subscribe<ResponseReceived>(x =>
+            {
+                Application.Current.Dispatcher.BeginInvoke(new Action(
+                delegate
+                {
+                    (RequestList.DataContext as CustomCrawlerDynamicsRequestDataGridViewModel).Items.Add(new CustomCrawlerDynamicsRequestDataGridItemViewModel
+                    {
+                        Id = (++index_count).ToString(),
+                        Type = "Response",
+                        Url = x.Response.Url,
+                        ContentType = x.ResourceType,
+                        Response = x
                     });
                 }));
             });

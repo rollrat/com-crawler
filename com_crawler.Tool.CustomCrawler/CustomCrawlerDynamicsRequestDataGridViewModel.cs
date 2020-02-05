@@ -6,7 +6,7 @@
 
 ***/
 
-using com_crawler.Tool.CustomCrawler.chrome_devtools.Response.Network;
+using com_crawler.Tool.CustomCrawler.chrome_devtools.Event.Network;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -28,6 +28,7 @@ namespace com_crawler.Tool.CustomCrawler
         }
 
         public RequestWillBeSent Request { get; set; }
+        public ResponseReceived Response { get; set; }
 
         private string _index;
         public string Id
@@ -37,6 +38,18 @@ namespace com_crawler.Tool.CustomCrawler
             {
                 if (_index == value) return;
                 _index = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _name;
+        public string Type
+        {
+            get { return _name; }
+            set
+            {
+                if (_name == value) return;
+                _name = value;
                 OnPropertyChanged();
             }
         }
@@ -53,14 +66,14 @@ namespace com_crawler.Tool.CustomCrawler
             }
         }
 
-        private string _name;
-        public string Type
+        private string _names;
+        public string ContentType
         {
-            get { return _name; }
+            get { return _names; }
             set
             {
-                if (_name == value) return;
-                _name = value;
+                if (_names == value) return;
+                _names = value;
                 OnPropertyChanged();
             }
         }

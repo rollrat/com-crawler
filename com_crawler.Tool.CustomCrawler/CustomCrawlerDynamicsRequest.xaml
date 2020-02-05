@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:com_crawler.Tool.CustomCrawler"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
-        Title="Custom Crawler Dynamics - Request" Height="393.628" Width="977.421">
+        Title="Custom Crawler Dynamics - Request" Height="393.628" Width="1072.434">
     <Grid Margin="8">
         <Grid.Resources>
             <Style x:Key="TextBlockStyleKey" TargetType="{x:Type TextBlock}">
@@ -30,9 +30,11 @@
             <DataGrid.Columns>
                 <materialDesign:MaterialDataGridTextColumn x:Name="C1" Binding="{Binding Id}" Width="60" Header="Index" ElementStyle="{StaticResource TextBlockStyleKey}"
                                                            EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnPopupEditingStyle}" SortDirection="Descending"/>
-                <materialDesign:MaterialDataGridTextColumn x:Name="C2" Binding="{Binding Url}" Width="700" Header="Url" ElementStyle="{StaticResource TextBlockStyleKey}"
+                <materialDesign:MaterialDataGridTextColumn x:Name="C2" Binding="{Binding Type}" Width="100" Header="Type" ElementStyle="{StaticResource TextBlockStyleKey}"
                                                            EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnPopupEditingStyle}"/>
-                <materialDesign:MaterialDataGridTextColumn x:Name="C3" Binding="{Binding Type}" Width="120" Header="Type" ElementStyle="{StaticResource TextBlockStyleKey}"
+                <materialDesign:MaterialDataGridTextColumn x:Name="C3" Binding="{Binding Url}" Width="700" Header="Url" ElementStyle="{StaticResource TextBlockStyleKey}"
+                                                           EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnPopupEditingStyle}"/>
+                <materialDesign:MaterialDataGridTextColumn x:Name="C4" Binding="{Binding ContentType}" Width="120" Header="Content Type" ElementStyle="{StaticResource TextBlockStyleKey}"
                                                            EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnPopupEditingStyle}"/>
             </DataGrid.Columns>
             <DataGrid.CellStyle>

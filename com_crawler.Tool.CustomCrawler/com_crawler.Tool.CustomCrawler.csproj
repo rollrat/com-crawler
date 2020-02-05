@@ -170,7 +170,6 @@
     <Compile Include="chrome-devtools\Method\Network\Enable.cs" />
     <Compile Include="chrome-devtools\Method\Network\GetCookies.cs" />
     <Compile Include="chrome-devtools\Types\Network\CallFrame.cs" />
-    <Compile Include="chrome-devtools\Event\CommonResponse.cs" />
     <Compile Include="chrome-devtools\Types\Network\Initiator.cs" />
     <Compile Include="chrome-devtools\Types\Network\Request.cs" />
     <Compile Include="chrome-devtools\Event\Network\RequestWillBeSent.cs" />
