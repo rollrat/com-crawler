@@ -167,8 +167,11 @@
     <Compile Include="chrome-devtools\ChromeDevtoolsEnvironment.cs" />
     <Compile Include="chrome-devtools\Event\Network\ResponseReceived.cs" />
     <Compile Include="chrome-devtools\Event\Network\ResponseReceivedExtraInfo.cs" />
+    <Compile Include="chrome-devtools\Method\DOM\Enable.cs" />
+    <Compile Include="chrome-devtools\Method\DOM\GetDocument.cs" />
     <Compile Include="chrome-devtools\Method\Network\Enable.cs" />
     <Compile Include="chrome-devtools\Method\Network\GetCookies.cs" />
+    <Compile Include="chrome-devtools\Types\DOM\Node.cs" />
     <Compile Include="chrome-devtools\Types\Network\CallFrame.cs" />
     <Compile Include="chrome-devtools\Types\Network\Initiator.cs" />
     <Compile Include="chrome-devtools\Types\Network\Request.cs" />
