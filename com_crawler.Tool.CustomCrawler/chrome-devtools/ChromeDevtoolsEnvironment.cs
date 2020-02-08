@@ -8,7 +8,11 @@
 
 using CefSharp.Wpf;
 using com_crawler.Tool.CustomCrawler.chrome_devtools.Event;
+using com_crawler.Tool.CustomCrawler.chrome_devtools.Event.Debugger;
+using com_crawler.Tool.CustomCrawler.chrome_devtools.Event.DOM;
 using com_crawler.Tool.CustomCrawler.chrome_devtools.Event.Network;
+using com_crawler.Tool.CustomCrawler.chrome_devtools.Method.Debugger;
+using com_crawler.Tool.CustomCrawler.chrome_devtools.Method.DOMDebugger;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -58,6 +62,14 @@ namespace com_crawler.Tool.CustomCrawler.chrome_devtools
     public class ChromeDevtoolsOptions
     {
         public const string Network = "{\"id\":1,\"method\":\"Network.enable\",\"params\":{\"maxPostDataSize\":65536}}";
+        public const string Debugger = "{\"id\":2,\"method\":\"Debugger.enable\",\"params\":{\"maxScriptsCacheSize\":10000000}}";
+        public const string DOM = "{\"id\":3,\"method\":\"DOM.enable\",\"params\":{}}";
+        public const string Target = "{\"id\":4,\"method\":\"Target.setAutoAttach\",\"params\":{\"autoAttach\":true,\"waitForDebuggerOnStart\":true,\"flatten\":true}}";
+        public const string Runtime = "{\"id\":5,\"method\":\"Runtime.enable\"}";
+        public const string RuntimeIWFD = "{\"id\":6,\"method\":\"Runtime.runIfWaitingForDebugger\"}";
+        public const string Page = "{\"id\":7,\"method\":\"Page.enable\"}";
+        public const string DebuggerACSD = "{\"id\":8,\"method\":\"Debugger.setAsyncCallStackDepth\",\"params\":{\"maxDepth\":32}}";
+        public const string DOMStackTrace = "{\"id\":9,\"method\":\"DOM.setNodeStackTracesEnabled\",\"params\":{\"enable\":true}}";
     }
 
     /// <summary>
@@ -93,7 +105,7 @@ namespace com_crawler.Tool.CustomCrawler.chrome_devtools
 
         ChromeDevtoolsListElement target;
         ClientWebSocket wss;
-        int id_count = 2;
+        int id_count = 9;
 
         public ChromeDevtoolsEnvironment(ChromeDevtoolsListElement target_info)
         {
@@ -105,7 +117,7 @@ namespace com_crawler.Tool.CustomCrawler.chrome_devtools
 
         private void timer_callback(object obj)
         {
-            Task.Run(async () => await send($"{{\"id\":{id_count++}}}"));
+            Task.Run(async () => await send($"{{\"id\":{Interlocked.Increment(ref id_count)},\"method\":\"DOM.getDocument\"}}"));
         }
 
         public async Task Connect()
@@ -116,14 +128,25 @@ namespace com_crawler.Tool.CustomCrawler.chrome_devtools
         public async Task Option()
         {
             await send(ChromeDevtoolsOptions.Network);
+            await send(ChromeDevtoolsOptions.Debugger);
+            await send(ChromeDevtoolsOptions.DOM);
+            await send(ChromeDevtoolsOptions.Target);
+            await send(ChromeDevtoolsOptions.Runtime);
+            await send(ChromeDevtoolsOptions.RuntimeIWFD);
+            await send(ChromeDevtoolsOptions.Page);
+            await send(ChromeDevtoolsOptions.DebuggerACSD);
+            await send(ChromeDevtoolsOptions.DOMStackTrace);
         }
 
         Dictionary<string, List<object>> events = new Dictionary<string, List<object>>();
+        HashSet<int> trigger_event = new HashSet<int>();
+        Dictionary<int, ChromeDevtoolsResponse> request_lists = new Dictionary<int, ChromeDevtoolsResponse>();
 
         public async Task Start()
         {
             await Task.Run(async () =>
             {
+                var ss = new List<string>();
                 var construct = new StringBuilder();
                 byte[] buffer = new byte[65535];
                 while (wss.State == WebSocketState.Open)
@@ -137,33 +160,26 @@ namespace com_crawler.Tool.CustomCrawler.chrome_devtools
                     {
                         var content = Encoding.UTF8.GetString(buffer, 0, result.Count);
                         construct.Append(content);
+
                         try
                         {
-                            var response = JsonConvert.DeserializeObject<ChromeDevtoolsResponse>(construct.ToString());
-                            response.RawMessage = content;
+                            var rr = construct.ToString();
+                            var response = JsonConvert.DeserializeObject<ChromeDevtoolsResponse>(rr);
+                            response.RawMessage = rr;
                             construct.Clear();
 
-                            if (response.Method != null && response.Method.ToString() == "Network.requestWillBeSent")
+                            if (response.Id != null && trigger_event.Contains(Convert.ToInt32(response.Id.ToString())))
                             {
-                                var xx = JsonConvert.DeserializeObject<RequestWillBeSent>(response.Params.ToString());
-                                raise_event("RequestWillBeSent", xx);
-                            }
-                            else if (response.Method != null && response.Method.ToString() == "Network.requestWillBeSentExtraInfo")
-                            {
-                                var xx = JsonConvert.DeserializeObject<RequestWillBeSentExtraInfo>(response.Params.ToString());
-                                raise_event("RequestWillBeSentExtraInfo", xx);
-                            }
-                            else if (response.Method != null && response.Method.ToString() == "Network.responseReceived")
-                            {
-                                var xx = JsonConvert.DeserializeObject<ResponseReceived>(response.Params.ToString());
-                                raise_event("ResponseReceived", xx);
-                            }
-                            else if (response.Method != null && response.Method.ToString() == "Network.responseReceivedExtraInfo")
-                            {
-                                var xx = JsonConvert.DeserializeObject<RequestWillBeSent>(response.Params.ToString());
-                                raise_event("ResponseReceivedExtraInfo", xx);
+                                lock (request_lists)
+                                    request_lists.Add(Convert.ToInt32(response.Id.ToString()), response);
+                                continue;
                             }
 
+                            if (response.Method != null)
+                            {
+                                raise_events_condition(response.Method.ToString(), response.Params.ToString());
+                            }
+                            
                             // ignore other events
                         }
                         catch { }
@@ -172,10 +188,32 @@ namespace com_crawler.Tool.CustomCrawler.chrome_devtools
             });
         }
 
-        private async Task send(string content)
+        private void raise_events_condition(string method_name, string param)
         {
-            byte[] buffer = Encoding.UTF8.GetBytes(content);
-            await wss.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Text, true, CancellationToken.None);
+            switch(method_name)
+            {
+                case Paused.Event:
+                    raise_event("Paused", JsonConvert.DeserializeObject<Paused>(param));
+                    break;
+                case ChildNodeInserted.Event:
+                    raise_event("ChildNodeInserted", JsonConvert.DeserializeObject<ChildNodeInserted>(param));
+                    break;
+                case DocumentUpdated.Event:
+                    raise_event("DocumentUpdated", JsonConvert.DeserializeObject<DocumentUpdated>(param));
+                    break;
+                case RequestWillBeSent.Event:
+                    raise_event("RequestWillBeSent", JsonConvert.DeserializeObject<RequestWillBeSent>(param));
+                    break;
+                case RequestWillBeSentExtraInfo.Event:
+                    raise_event("RequestWillBeSentExtraInfo", JsonConvert.DeserializeObject<RequestWillBeSentExtraInfo>(param));
+                    break;
+                case ResponseReceived.Event:
+                    raise_event("ResponseReceived", JsonConvert.DeserializeObject<ResponseReceived>(param));
+                    break;
+                case ResponseReceivedExtraInfo.Event:
+                    raise_event("ResponseReceivedExtraInfo", JsonConvert.DeserializeObject<ResponseReceivedExtraInfo>(param));
+                    break;
+            }
         }
 
         private void raise_event<T>(string what, T obj)
@@ -187,7 +225,7 @@ namespace com_crawler.Tool.CustomCrawler.chrome_devtools
             }
         }
 
-        string[] events_list = new[] { "RequestWillBeSent", "RequestWillBeSentExtraInfo", "ResponseReceived", "ResponseReceivedExtraInfo" };
+        string[] events_list = new[] { "Paused", "ChildNodeInserted", "DocumentUpdated", "RequestWillBeSent", "RequestWillBeSentExtraInfo", "ResponseReceived", "ResponseReceivedExtraInfo" };
 
         public void Subscribe<T>(Action<T> callback)
         {
@@ -202,17 +240,101 @@ namespace com_crawler.Tool.CustomCrawler.chrome_devtools
             }
         }
 
-        public void Send(ChromeDevtoolsResponse what)
+        static Dictionary<Type, string> method_lists = new Dictionary<Type, string>
         {
+            { typeof(Resume), Resume.Method },
+            { typeof(Method.DOM.Enable), Method.DOM.Enable.Method },
+            { typeof(Method.DOM.GetDocument), Method.DOM.GetDocument.Method },
+            { typeof(Method.DOM.GetNodeStackTraces), Method.DOM.GetNodeStackTraces.Method },
+            { typeof(RemoveDOMBreakpoint), RemoveDOMBreakpoint.Method },
+            { typeof(SetDOMBreakpoint), SetDOMBreakpoint.Method },
+            { typeof(Method.Network.Enable), Method.Network.Enable.Method },
+            { typeof(Method.Network.GetCookies), Method.Network.GetCookies.Method },
+        };
+
+        object send_lock = new object();
+
+        private async Task send(string content)
+        {
+            byte[] buffer = Encoding.UTF8.GetBytes(content);
+            await wss.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Text, true, CancellationToken.None);
+        }
+
+        public async Task Send<T>(T param)
+        {
+            if (method_lists.ContainsKey(typeof(T)))
+            {
+                await send($"{{\"id\":{Interlocked.Increment(ref id_count)},\"method\":\"{method_lists[typeof(T)]}\",\"params\":{JsonConvert.SerializeObject(param)}}}");
+            }
+        }
+
+        public async Task<ChromeDevtoolsResponse> Request<T>()
+        {
+            if (method_lists.ContainsKey(typeof(T)))
+            {
+                var id = Interlocked.Increment(ref id_count);
+                trigger_event.Add(id);
+                await send($"{{\"id\":{id},\"method\":\"{method_lists[typeof(T)]}\",\"params\":{{}}}}");
+                return await Task.Run(() =>
+                {
+                    while (true)
+                    {
+                        lock (request_lists)
+                        {
+                            if (request_lists.ContainsKey(id))
+                            {
+                                return request_lists[id];
+                            }
+                        }
+                        Thread.Sleep(100);
+                    }
+                });
+            }
+            return null;
+        }
+
+        public async Task<ChromeDevtoolsResponse> Request<T>(T param)
+        {
+            if (method_lists.ContainsKey(typeof(T)))
+            {
+                var id = Interlocked.Increment(ref id_count);
+                trigger_event.Add(id);
+                await send($"{{\"id\":{id},\"method\":\"{method_lists[typeof(T)]}\",\"params\":{JsonConvert.SerializeObject(param)}}}");
+                return await Task.Run(() =>
+                {
+                    while (true)
+                    {
+                        lock (request_lists)
+                        {
+                            if (request_lists.ContainsKey(id))
+                            {
+                                return request_lists[id];
+                            }
+                        }
+                        Thread.Sleep(100);
+                    }
+                });
+            }
+            return null;
+        }
+
+        public void PauseTimer()
+        {
+            timer.Change(int.MaxValue, int.MaxValue);
         }
 
         public void Dispose()
         {
             if (wss != null)
             {
-                wss.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None).Wait();
-                wss = null;
-                timer.Dispose();
+                try
+                {
+                    timer.Dispose();
+                    wss.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None).Wait();
+                    wss = null;
+                }
+                catch
+                { }
             }
         }
     }

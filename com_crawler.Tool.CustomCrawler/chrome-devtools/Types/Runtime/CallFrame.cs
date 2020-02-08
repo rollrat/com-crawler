@@ -13,7 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace com_crawler.Tool.CustomCrawler.chrome_devtools.Types.Network
+namespace com_crawler.Tool.CustomCrawler.chrome_devtools.Types.Runtime
 {
     public class CallFrame
     {

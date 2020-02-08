@@ -7,7 +7,15 @@
 ***/
 
 using com_crawler.Tool.CustomCrawler.chrome_devtools;
+using com_crawler.Tool.CustomCrawler.chrome_devtools.Event.Debugger;
+using com_crawler.Tool.CustomCrawler.chrome_devtools.Event.DOM;
 using com_crawler.Tool.CustomCrawler.chrome_devtools.Event.Network;
+using com_crawler.Tool.CustomCrawler.chrome_devtools.Method.Debugger;
+using com_crawler.Tool.CustomCrawler.chrome_devtools.Method.DOM;
+using com_crawler.Tool.CustomCrawler.chrome_devtools.Method.DOMDebugger;
+using com_crawler.Tool.CustomCrawler.chrome_devtools.Types.DOM;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -70,6 +78,36 @@ namespace com_crawler.Tool.CustomCrawler
                 }));
             });
 
+            env.Subscribe<DocumentUpdated>(x =>
+            {
+                Application.Current.Dispatcher.BeginInvoke(new Action(
+                delegate
+                {
+                    (RequestList.DataContext as CustomCrawlerDynamicsRequestDataGridViewModel).Items.Add(new CustomCrawlerDynamicsRequestDataGridItemViewModel
+                    {
+                        Id = (++index_count).ToString(),
+                        Type = "DocumentUpdated",
+                    });
+                }));
+            });
+
+            env.Subscribe<ChildNodeInserted>(x =>
+            {
+                var xx = "";
+                if (x.Node == null || x.Node.Attributes == null)
+                    xx = string.Join(",", x.Node.Attributes);
+                Application.Current.Dispatcher.BeginInvoke(new Action(
+                delegate
+                {
+                    (RequestList.DataContext as CustomCrawlerDynamicsRequestDataGridViewModel).Items.Add(new CustomCrawlerDynamicsRequestDataGridItemViewModel
+                    {
+                        Id = (++index_count).ToString(),
+                        Type = "ChildNodeInserted",
+                        Url = $"{x.Node.NodeName} {xx}"
+                    });
+                }));
+            });
+           
             Closed += (s, e) =>
             {
                 env.Dispose();

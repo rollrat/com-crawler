@@ -15,13 +15,11 @@ using System.Threading.Tasks;
 
 namespace com_crawler.Tool.CustomCrawler.chrome_devtools.Method.DOM
 {
-    public class GetDocument
+    public class GetNodeStackTraces
     {
-        public const string Method = "DOM.getDocument";
+        public const string Method = "DOM.getNodeStackTraces";
 
-        [JsonProperty(PropertyName = "depth")]
-        public int Depth { get; set; }
-        [JsonProperty(PropertyName = "pierce")]
-        public bool Pierce { get; set; }
+        [JsonProperty(PropertyName = "nodeId")]
+        public int NodeId { get; set; }
     }
 }

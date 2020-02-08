@@ -18,6 +18,8 @@ namespace com_crawler.Tool.CustomCrawler.chrome_devtools.Event.Network
 {
     class ResponseReceivedExtraInfo
     {
+        public const string Event = "Network.responseReceivedExtraInfo";
+
         [JsonProperty(PropertyName = "requestId")]
         public string RequestId { get; set; }
         [JsonProperty(PropertyName = "blockedCookies")]

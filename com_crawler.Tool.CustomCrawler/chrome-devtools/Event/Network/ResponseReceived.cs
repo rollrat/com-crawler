@@ -18,6 +18,8 @@ namespace com_crawler.Tool.CustomCrawler.chrome_devtools.Event.Network
 {
     public class ResponseReceived
     {
+        public const string Event = "Network.responseReceived";
+
         [JsonProperty(PropertyName = "requestId")]
         public string RequestId { get; set; }
         [JsonProperty(PropertyName = "loaderId")]

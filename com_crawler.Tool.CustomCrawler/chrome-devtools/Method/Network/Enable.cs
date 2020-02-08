@@ -17,7 +17,7 @@ namespace com_crawler.Tool.CustomCrawler.chrome_devtools.Method.Network
 {
     public class Enable
     {
-        public static string Method = "Network.enable";
+        public const string Method = "Network.enable";
 
         [JsonProperty(PropertyName = "maxTotalBufferSize")]
         public int MaxTotalBufferSize;

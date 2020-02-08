@@ -18,7 +18,7 @@ namespace com_crawler.Tool.CustomCrawler.chrome_devtools.Method.Network
 {
     public class GetCookies
     {
-        public static string Method = "Network.getCookies";
+        public const string Method = "Network.getCookies";
 
         [JsonProperty(PropertyName = "urls")]
         public string[] Urls;

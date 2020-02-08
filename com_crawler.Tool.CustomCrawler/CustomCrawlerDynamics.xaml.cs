@@ -9,6 +9,13 @@
 using CefSharp;
 using CefSharp.Wpf;
 using com_crawler.Tool.CustomCrawler.chrome_devtools;
+using com_crawler.Tool.CustomCrawler.chrome_devtools.Method.Debugger;
+using com_crawler.Tool.CustomCrawler.chrome_devtools.Method.DOM;
+using com_crawler.Tool.CustomCrawler.chrome_devtools.Method.DOMDebugger;
+using com_crawler.Tool.CustomCrawler.chrome_devtools.Types.DOM;
+using com_crawler.Tool.CustomCrawler.chrome_devtools.Types.Runtime;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,7 +47,47 @@ namespace com_crawler.Tool.CustomCrawler
             browser = new ChromiumWebBrowser(string.Empty);
             browserContainer.Content = browser;
 
+            browser.LoadingStateChanged += Browser_LoadingStateChanged;
+
             Closed += CustomCrawlerDynamics_Closed;
+        }
+
+        private async void Browser_LoadingStateChanged(object sender, LoadingStateChangedEventArgs e)
+        {
+            if (!e.IsLoading && env != null)
+            {
+                var doc = await env.Request(new GetDocument { Depth = -1 });
+                var root_node = JsonConvert.DeserializeObject<Node>(JObject.Parse(doc.Result.ToString())["root"].ToString());
+                env.PauseTimer();
+                _ = find_source(root_node);
+            }
+        }
+
+        private async Task find_source(Node nn)
+        {
+            if (nn.Children != null)
+            {
+                _ = Application.Current.Dispatcher.BeginInvoke(new Action(
+                delegate
+                {
+                    URLText.Text = nn.NodeId.ToString();
+                }));
+                try
+                {
+                    var st = await env.Request(new GetNodeStackTraces { NodeId = nn.NodeId });
+                    if (st.Result != null)
+                        ;
+                    var ff = JsonConvert.DeserializeObject<StackTrace>(JObject.Parse(st.Result.ToString())["creation"].ToString());
+                    MessageBox.Show(JObject.Parse(st.Result.ToString())["creation"].ToString());
+                } catch (Exception ex) {
+                    if (ex.Message.Contains("WebSocket"))
+                        ;
+                }
+                foreach (var child in nn.Children)
+                {
+                    await find_source(child);
+                }
+            }
         }
 
         private void CustomCrawlerDynamics_Closed(object sender, EventArgs e)
@@ -58,7 +105,7 @@ namespace com_crawler.Tool.CustomCrawler
                 var token = new Random().Next();
                 browser.LoadHtml(token.ToString());
 
-                var target = ChromeDevtoolsEnvironment.GetDebuggeeList().Where(x => x.Title == $"data:text/html,{token}");
+                var target = ChromeDevtoolsEnvironment.GetDebuggeeList().Where(x => x.Url == $"data:text/html,{token}");
                 env = ChromeDevtoolsEnvironment.CreateInstance(target.First());
                 new CustomCrawlerDynamicsRequest(env).Show();
 

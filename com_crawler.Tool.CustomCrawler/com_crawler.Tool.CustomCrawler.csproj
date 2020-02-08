@@ -165,14 +165,25 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="chrome-devtools\ChromeDevtoolsEnvironment.cs" />
+    <Compile Include="chrome-devtools\Event\Debugger\Paused.cs" />
+    <Compile Include="chrome-devtools\Event\DOM\ChildNodeInserted.cs" />
+    <Compile Include="chrome-devtools\Event\DOM\DocumentUpdated.cs" />
     <Compile Include="chrome-devtools\Event\Network\ResponseReceived.cs" />
     <Compile Include="chrome-devtools\Event\Network\ResponseReceivedExtraInfo.cs" />
+    <Compile Include="chrome-devtools\Method\Debugger\Resume.cs" />
+    <Compile Include="chrome-devtools\Method\DOMDebugger\RemoveDOMBreakpoint.cs" />
+    <Compile Include="chrome-devtools\Method\DOMDebugger\SetDOMBreakpoint.cs" />
     <Compile Include="chrome-devtools\Method\DOM\Enable.cs" />
     <Compile Include="chrome-devtools\Method\DOM\GetDocument.cs" />
+    <Compile Include="chrome-devtools\Method\DOM\GetNodeStackTraces.cs" />
     <Compile Include="chrome-devtools\Method\Network\Enable.cs" />
     <Compile Include="chrome-devtools\Method\Network\GetCookies.cs" />
+    <Compile Include="chrome-devtools\Types\Debugger\CallFrame.cs" />
+    <Compile Include="chrome-devtools\Types\Debugger\Location.cs" />
+    <Compile Include="chrome-devtools\Types\Debugger\Scope.cs" />
+    <Compile Include="chrome-devtools\Types\DOM\BackendNode.cs" />
     <Compile Include="chrome-devtools\Types\DOM\Node.cs" />
-    <Compile Include="chrome-devtools\Types\Network\CallFrame.cs" />
+    <Compile Include="chrome-devtools\Types\Runtime\CallFrame.cs" />
     <Compile Include="chrome-devtools\Types\Network\Initiator.cs" />
     <Compile Include="chrome-devtools\Types\Network\Request.cs" />
     <Compile Include="chrome-devtools\Event\Network\RequestWillBeSent.cs" />
@@ -180,7 +191,7 @@
     <Compile Include="chrome-devtools\Types\Network\ResourceTiming.cs" />
     <Compile Include="chrome-devtools\Types\Network\Response.cs" />
     <Compile Include="chrome-devtools\Types\Network\SecurityDetails.cs" />
-    <Compile Include="chrome-devtools\Types\Network\StackTrace.cs" />
+    <Compile Include="chrome-devtools\Types\Runtime\StackTrace.cs" />
     <Compile Include="chrome-devtools\Types\Network\BlockedCookieWithReason.cs" />
     <Compile Include="chrome-devtools\Types\Network\Cookie.cs" />
     <Compile Include="CustomCrawler.xaml.cs">

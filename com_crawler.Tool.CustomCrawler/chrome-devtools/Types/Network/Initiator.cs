@@ -6,6 +6,7 @@
 
 ***/
 
+using com_crawler.Tool.CustomCrawler.chrome_devtools.Types.Runtime;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;

@@ -12,10 +12,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace com_crawler.Tool.CustomCrawler.chrome_devtools.Method.DOM
+namespace com_crawler.Tool.CustomCrawler.chrome_devtools.Event.DOM
 {
-    public class Enable
+    public class DocumentUpdated
     {
-        public const string Method = "DOM.enable";
+        public const string Event = "DOM.documentUpdated";
     }
 }
