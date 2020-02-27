@@ -18,6 +18,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Version = com_crawler.Version;
 
 namespace com_crawler.Console
@@ -74,6 +75,13 @@ namespace com_crawler.Console
         /// Bot Options
         /// </summary>
 
+
+        /// <summary>
+        /// Server
+        /// </summary>
+
+        [CommandLine("--start-server", CommandType.ARGUMENTS, ArgumentsCount = 1, Info = "Start API server.", Help = "use --start-server <port>")]
+        public string[] StartServer;
     }
 
     public class Runnable
@@ -146,6 +154,10 @@ namespace com_crawler.Console
                 weird.ForEach(x => n_args.Add(arguments[x]));
 
                 ProcessExtract(option.Url[0], n_args.ToArray(), option.PathFormat, option.ExtractInformation, option.ExtractLinks, option.PrintProcess, option.DisableDownloadProgress, option.DownloadPath);
+            }
+            else if (option.StartServer != null)
+            {
+                ProcessStartServer(option.StartServer);
             }
             else if (option.Error)
             {
@@ -426,6 +438,16 @@ namespace com_crawler.Console
                 {
                     Logs.Instance.PushError("[Extractor] Unhandled Exception - " + e.Message + "\r\n" + e.StackTrace);
                 }
+            }
+        }
+
+        static void ProcessStartServer(string[] args)
+        {
+            Server.Server.Instance.StartServer(Convert.ToInt32(args[0]));
+
+            while (true)
+            {
+                Thread.Sleep(500);
             }
         }
     }
