@@ -8,24 +8,6 @@ using System.Text;
 
 namespace com_crawler.Component
 {
-    public enum ComponentType
-    {
-        CommunitySite,
-        NewsSite,
-    }
-
-    public class ComponentQuery
-    {
-        public DateTime StartDateTime { get; set; } = DateTime.MinValue;
-        public DateTime EndDateTime { get; set; } = DateTime.MaxValue;
-
-    }
-
-    public class ComponentLoginData
-    {
-
-    }
-
     /// <summary>
     /// Component and Extarctor are different.
     /// 
@@ -35,13 +17,5 @@ namespace com_crawler.Component
     /// </summary>
     public abstract class ComponentModel
     {
-        public ComponentType Type { get; protected set; }
-
-
-    }
-
-    public class ComponentManager
-    {
-
     }
 }
