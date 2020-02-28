@@ -24,7 +24,7 @@ namespace com_crawler.Server
         public async void StartServer(int port)
         {
             Logger.UnregisterLogger<ConsoleLogger>();
-            using (var server = CreateWebServer($"http://localhost:{port}/"))
+            using (var server = CreateWebServer($"http://127.0.0.1:{port}/"))
             {
                 await server.RunAsync();
             }
