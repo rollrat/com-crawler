@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace com_crawler.Bot.REST
+namespace com_crawler.ChatBot
 {
     public class KakaoBot
     {

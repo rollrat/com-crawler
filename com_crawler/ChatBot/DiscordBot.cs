@@ -5,9 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace com_crawler.Bot
+namespace com_crawler.ChatBot
 {
-    public class BotManager
+    public class DiscordBot
     {
     }
 }
