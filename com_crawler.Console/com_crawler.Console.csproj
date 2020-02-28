@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="publish-linux.bat" />
     <None Remove="publish.bat" />
   </ItemGroup>
 
