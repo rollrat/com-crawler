@@ -4,9 +4,7 @@
 using com_crawler.Utils;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Threading;
 
 namespace com_crawler.Setting
@@ -37,6 +35,8 @@ namespace com_crawler.Setting
         public AppSettings AppSettings;
 
         public DataBaseSettings DataBaseSettings;
+
+        public BotSettings BotSettings;
 
         /// <summary>
         /// Scheduler Thread Count
@@ -107,6 +107,13 @@ namespace com_crawler.Setting
                     {
                         DataBaseServer = DataBaseServer.MySQL,
                         ConnectionString = "",
+                    },
+
+                    BotSettings = new BotSettings()
+                    {
+                        EnableTelegramBot = false,
+                        TelegramBotAccessToken = "",
+                        AccessIdentifierMessage = ""
                     },
                 };
             }
@@ -190,6 +197,16 @@ namespace com_crawler.Setting
                 {
                     DataBaseServer = DataBaseServer.MySQL,
                     ConnectionString = "",
+                };
+            }
+
+            if (Model.BotSettings == null)
+            {
+                Model.BotSettings = new BotSettings()
+                {
+                    EnableTelegramBot = false,
+                    TelegramBotAccessToken = "",
+                    AccessIdentifierMessage = ""
                 };
             }
         }

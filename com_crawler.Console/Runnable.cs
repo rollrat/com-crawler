@@ -75,6 +75,8 @@ namespace com_crawler.Console
         /// Bot Options
         /// </summary>
 
+        [CommandLine("--start-bot", CommandType.OPTION, Info = "Start ChatBot server.", Help = "use --start-bot <port>")]
+        public bool StartBot;
 
         /// <summary>
         /// Server
@@ -154,6 +156,10 @@ namespace com_crawler.Console
                 weird.ForEach(x => n_args.Add(arguments[x]));
 
                 ProcessExtract(option.Url[0], n_args.ToArray(), option.PathFormat, option.ExtractInformation, option.ExtractLinks, option.PrintProcess, option.DisableDownloadProgress, option.DownloadPath);
+            }
+            else if (option.StartBot)
+            {
+                ProcessStartChatBotServer();
             }
             else if (option.StartServer != null)
             {
@@ -444,6 +450,16 @@ namespace com_crawler.Console
         static void ProcessStartServer(string[] args)
         {
             Server.Server.Instance.StartServer(Convert.ToInt32(args[0]));
+
+            while (true)
+            {
+                Thread.Sleep(500);
+            }
+        }
+
+        static void ProcessStartChatBotServer()
+        {
+            ChatBot.BotManager.Instance.StartBots();
 
             while (true)
             {
