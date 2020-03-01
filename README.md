@@ -6,7 +6,7 @@ This project collect the title and additional information of the post and build 
 Provides fast web crawling using proxy and various add-ons.
 We are looking for a very stable and scalable design based on Rust.
 
-# Documents
+## Documents
 
 [Development Manual](doc/development.md)
 
