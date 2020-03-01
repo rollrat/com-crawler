@@ -10,6 +10,33 @@ We are looking for a very stable and scalable design based on Rust.
 
 ### Bot
 
+### ChatBot
+
+Custom Crawler provides `KakaoTalk(Not now)`, `Discord(Not now)` and `Telegram` chatbot features 
+for program controlling and information provision.
+
+To use this feature you need to enable the `setting.json`.
+
+``` json
+  "BotSettings": {
+    "EnableTelegramBot": true,
+    "TelegramBotAccessToken": "--- insert your access token here ---",
+    "AccessIdentifierMessage": "--- insert your identifier message for audit admin ---"
+  }
+```
+
+```
+./com_crawler.Console --start-bot
+```
+
+You can use the following commands on the chatbot:
+
+```
+/help
+/rap <Identifier Message>: Add the current user as an administrator.
+/time : Return current server time.
+```
+
 ### Components
 
 ### Downloader
@@ -50,6 +77,18 @@ If you want to format the download path, enter `--list-extractor` to see the sup
 ```
 
 ### Server
+
+Custom Crawler API Server Example: https://cc.rollrat.com/
+
+Server Test: https://cc.rollrat.com/api/test
+
+It is a function that can provide various functions of custom crawler in the form of server.
+You can use this feature to build an internal proxy server or to create 
+a bot that can gather information from outside.
+
+```
+./com_crawler.Console <Port-Number>
+```
 
 ## Contribution
 
