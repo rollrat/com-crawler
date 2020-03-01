@@ -6,6 +6,10 @@ This project collect the title and additional information of the post and build 
 Provides fast web crawling using proxy and various add-ons.
 We are looking for a very stable and scalable design based on Rust.
 
+# Documents
+
+[Development Manual](doc/development.md)
+
 ## How to use?
 
 ### Bot
@@ -95,18 +99,3 @@ a bot that can gather information from outside.
 Welcome to any form of contribution!
 
 If you are interested in this project or have any suggestions, feel free to open the issue!
-
-## Thanks
-
-```
-dotnet: https://dotnet.microsoft.com/
-youtube-dl: https://github.com/ytdl-org/youtube-dl
-pixivpy: https://github.com/upbit/pixivpy
-Pixeez: https://github.com/cucmberium/Pixeez
-ImageSharp: https://github.com/SixLabors/ImageSharp
-HtmlAgilityPack: https://html-agility-pack.net/
-Json.NET: https://www.newtonsoft.com/json
-FFmpeg: https://www.ffmpeg.org/
-Orbot: https://www.torproject.org
-Free Proxies: http://www.freeproxylists.net/, http://www.proxylists.net/, https://www.us-proxy.org/, http://free-proxy.cz/en/
-```
