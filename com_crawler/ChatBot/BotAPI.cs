@@ -18,8 +18,6 @@ namespace com_crawler.ChatBot
         {
             return Task.Run(async () =>
             {
-                Log.Logs.Instance.Push(msg);
-
                 try
                 {
                     var command = msg.Split(' ')[0];
@@ -28,7 +26,7 @@ namespace com_crawler.ChatBot
 
                     switch (command.ToLower())
                     {
-                        case "rap": // request access permission
+                        case "/rap": // request access permission
 
                             if (hh.Contains(user))
                             {
@@ -47,30 +45,30 @@ namespace com_crawler.ChatBot
                             await bot.SendMessage(user, "It does not match the identification message.\r\nPlease try again.");
                             break;
 
-                        case "time": // request server time
+                        case "/time": // request server time
 
                             await bot.SendMessage(user, DateTime.Now.ToString());
                             break;
 
-                        case "help":
+                        case "/help":
 
                             var builder = new StringBuilder();
                             builder.Append("API for Custom Crawler Internal Server\r\n");
                             builder.Append("\r\n");
-                            builder.Append("rap <msg> => Request access permission\r\n");
-                            builder.Append("time => Request server time.\r\n");
+                            builder.Append("/rap <msg> => Request access permission\r\n");
+                            builder.Append("/time => Request server time.\r\n");
                             await bot.SendMessage(user, builder.ToString());
                             break;
 
                         default:
-                            await bot.SendMessage(user, $"'{command}' is not proper command!\r\nEnter 'help' to get more informations.");
+                            await bot.SendMessage(user, $"'{command}' is not proper command!\r\nEnter '/help' to get more informations.");
                             break;
                     }
                 }
                 catch (Exception e)
                 {
                     Log.Logs.Instance.PushError("[Bot] " + e.Message + "\r\n" + e.StackTrace);
-                    await bot.SendMessage(user, "Internal server error!");
+                    await bot.SendMessage(user, "Internal server error!\r\nIf the error persists, please report to rollrat.cse@gmail.com.");
                 }
 
             });
