@@ -71,6 +71,9 @@ namespace com_crawler
             // Initialize Postprocessor Scheduler
             PPScheduler = new PostprocessorScheduler(Settings.Instance.Model.PostprocessorThreadCount);
 
+            // Initialize Resource Monitor
+            Condition.Instance.Start();
+
             Logs.Instance.Push("App provider starts.");
 
             GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
@@ -95,6 +98,8 @@ namespace com_crawler
 
         public static void Deinitialize()
         {
+            Condition.Instance.Stop();
+
             Logs.Instance.Push("App provider de-initialized.");
         }
     }

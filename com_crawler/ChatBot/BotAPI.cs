@@ -50,14 +50,33 @@ namespace com_crawler.ChatBot
                             await bot.SendMessage(user, DateTime.Now.ToString());
                             break;
 
+                        case "/condition":
+
+                            if (!hh.Contains(user))
+                            {
+                                await bot.SendMessage(user, "You do not have permission to run this command.");
+                                break;
+                            }
+
+                            {
+                                var builder = new StringBuilder(); 
+                                builder.Append($"Memory-Usage: {(Condition.Instance.GetMemoryUsage() / 1024).ToString("#,#")} KB\r\n");
+                                builder.Append($"CPU-Usage per Min: {(Condition.Instance.GetLastMinuteCPUUsage() * 100.0).ToString("#.#")}%\r\n");
+                                await bot.SendMessage(user, builder.ToString());
+                            }
+                            break;
+
                         case "/help":
 
-                            var builder = new StringBuilder();
-                            builder.Append("API for Custom Crawler Internal Server\r\n");
-                            builder.Append("\r\n");
-                            builder.Append("/rap <msg> => Request access permission\r\n");
-                            builder.Append("/time => Request server time.\r\n");
-                            await bot.SendMessage(user, builder.ToString());
+                            {
+                                var builder = new StringBuilder();
+                                builder.Append("API for Custom Crawler Internal Server\r\n");
+                                builder.Append("\r\n");
+                                builder.Append("/rap <msg> => Request access permission\r\n");
+                                builder.Append("/time => Request server time.\r\n");
+                                builder.Append("/condition => Request server condition.\r\n");
+                                await bot.SendMessage(user, builder.ToString());
+                            }
                             break;
 
                         default:
