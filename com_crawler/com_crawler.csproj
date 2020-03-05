@@ -13,6 +13,7 @@
     <PackageReference Include="GraphQL" Version="2.4.0" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.17" />
     <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="3.1.1" />
+    <PackageReference Include="MimeKit" Version="2.5.1" />
     <PackageReference Include="MySql.Data" Version="8.0.19" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="PacketDotNet" Version="1.0.3" />
@@ -20,6 +21,7 @@
     <PackageReference Include="RobotsTxt" Version="2014.2.19" />
     <PackageReference Include="Selenium.WebDriver" Version="3.141.0" />
     <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-beta0007" />
+    <PackageReference Include="SmtpServer" Version="6.4.0" />
     <PackageReference Include="System.Net.NameResolution" Version="4.3.0" />
     <PackageReference Include="System.Threading.ThreadPool" Version="4.3.0" />
     <PackageReference Include="Telegram.Bot" Version="15.2.1" />
@@ -28,6 +30,7 @@
   <ItemGroup>
     <Folder Include="Compiler\" />
     <Folder Include="Browser\" />
+    <Folder Include="Component\Community\" />
     <Folder Include="Robot\Signal\" />
   </ItemGroup>
 
