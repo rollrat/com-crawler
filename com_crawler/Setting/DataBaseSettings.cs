@@ -20,6 +20,10 @@ namespace com_crawler.Setting
     {
         public DataBaseServer DataBaseServer;
 
-        public string ConnectionString;
+        public string EndPoint;
+        public int PortNumber;
+        public string UserName;
+        public string Password;
+        public string DataBaseName;
     }
 }

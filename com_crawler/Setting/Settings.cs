@@ -108,7 +108,11 @@ namespace com_crawler.Setting
                     DataBaseSettings = new DataBaseSettings()
                     {
                         DataBaseServer = DataBaseServer.MySQL,
-                        ConnectionString = "",
+                        EndPoint = "",
+                        PortNumber = 0,
+                        UserName = "",
+                        Password = "",
+                        DataBaseName = "",
                     },
 
                     BotSettings = new BotSettings()
@@ -206,7 +210,11 @@ namespace com_crawler.Setting
                 Model.DataBaseSettings = new DataBaseSettings
                 {
                     DataBaseServer = DataBaseServer.MySQL,
-                    ConnectionString = "",
+                    EndPoint = "",
+                    PortNumber = 0,
+                    UserName = "",
+                    Password = "",
+                    DataBaseName = "",
                 };
             }
 
