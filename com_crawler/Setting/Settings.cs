@@ -38,6 +38,8 @@ namespace com_crawler.Setting
 
         public BotSettings BotSettings;
 
+        public ServerSettings ServerSettings;
+
         /// <summary>
         /// Scheduler Thread Count
         /// </summary>
@@ -115,6 +117,14 @@ namespace com_crawler.Setting
                         TelegramBotAccessToken = "",
                         AccessIdentifierMessage = ""
                     },
+
+                    ServerSettings = new ServerSettings
+                    {
+                        WebServerPort = 7979,
+                        EnableMailServer = false,
+                        AuthMailUser = "",
+                        AuthMailPassword = ""
+                    }
                 };
             }
             Save();
@@ -207,6 +217,17 @@ namespace com_crawler.Setting
                     EnableTelegramBot = false,
                     TelegramBotAccessToken = "",
                     AccessIdentifierMessage = ""
+                };
+            }
+
+            if (Model.ServerSettings == null)
+            {
+                Model.ServerSettings = new ServerSettings
+                {
+                    WebServerPort = 7979,
+                    EnableMailServer = false,
+                    AuthMailUser = "",
+                    AuthMailPassword = ""
                 };
             }
         }

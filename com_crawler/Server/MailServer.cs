@@ -38,7 +38,8 @@ namespace com_crawler.Server
                 var textMessage = (ITextMessage)transaction.Message;
 
                 var message = MimeKit.MimeMessage.Load(textMessage.Content);
-                //Console.WriteLine(message.ToString());
+
+                Log.Logs.Instance.Push($"[Mail Server] Mail received. from='{message.From}', to='{message.To}', title='{message.Subject}'");
 
                 return Task.FromResult(SmtpResponse.Ok);
             }
@@ -46,14 +47,16 @@ namespace com_crawler.Server
 
         public class MF : IMailboxFilter, IMailboxFilterFactory
         {
-            public Task<MailboxFilterResult> CanAcceptFromAsync(ISessionContext context, IMailbox @from, int size = 0, CancellationToken token)
+            public Task<MailboxFilterResult> CanAcceptFromAsync(ISessionContext context, IMailbox @from, int size, CancellationToken token)
             {
-                if (String.Equals(@from.Host, "test.com"))
-                {
-                    return Task.FromResult(MailboxFilterResult.Yes);
-                }
-
-                return Task.FromResult(MailboxFilterResult.NoPermanently);
+                return Task.FromResult(MailboxFilterResult.Yes);
+                
+                //if (String.Equals(@from.Host, "test.com"))
+                //{
+                //    return Task.FromResult(MailboxFilterResult.Yes);
+                //}
+                //
+                //return Task.FromResult(MailboxFilterResult.NoPermanently);
             }
 
             public Task<MailboxFilterResult> CanDeliverToAsync(ISessionContext context, IMailbox to, IMailbox @from, CancellationToken token)
@@ -71,9 +74,13 @@ namespace com_crawler.Server
         {
             public Task<bool> AuthenticateAsync(ISessionContext context, string user, string password, CancellationToken token)
             {
-                //Console.WriteLine("User={0} Password={1}", user, password);
+                Log.Logs.Instance.Push($"[Mail Server] New authentication request received user='{user}', pwd='{password}'");
 
-                return Task.FromResult(user.Length > 4);
+                if (Setting.Settings.Instance.Model.ServerSettings.AuthMailUser == user &&
+                    Setting.Settings.Instance.Model.ServerSettings.AuthMailPassword == password)
+                    return Task.FromResult(true);
+
+                return Task.FromResult(false);
             }
 
             public IUserAuthenticator CreateInstance(ISessionContext context)

@@ -37,6 +37,9 @@ namespace com_crawler.Console
         [CommandLine("--build-free-proxy", CommandType.OPTION, Info = "Build free proxy list.")]
         public bool BuildFreeProxy;
 
+        [CommandLine("--recover-settings", CommandType.OPTION, Info = "Recover settings.json")]
+        public bool RecoverSettings;
+
         /// <summary>
         /// Extractor Options
         /// </summary>
@@ -75,15 +78,15 @@ namespace com_crawler.Console
         /// Bot Options
         /// </summary>
 
-        [CommandLine("--start-bot", CommandType.OPTION, Info = "Start ChatBot server.", Help = "use --start-bot <port>")]
+        [CommandLine("--start-bot", CommandType.OPTION, Info = "Start ChatBot server.", Help = "use --start-bot")]
         public bool StartBot;
 
         /// <summary>
         /// Server
         /// </summary>
 
-        [CommandLine("--start-server", CommandType.ARGUMENTS, ArgumentsCount = 1, Info = "Start API server.", Help = "use --start-server <port>")]
-        public string[] StartServer;
+        [CommandLine("--start-server", CommandType.OPTION, Info = "Start API server.", Help = "use --start-server")]
+        public bool StartServer;
     }
 
     public class Runnable
@@ -109,6 +112,11 @@ namespace com_crawler.Console
             else if (option.BuildFreeProxy)
             {
                 FreeProxy.Instance.Build();
+            }
+            else if (option.RecoverSettings)
+            {
+                Settings.Instance.Recover();
+                Settings.Instance.Save();
             }
             else if (option.ListExtractor)
             {
@@ -161,9 +169,9 @@ namespace com_crawler.Console
             {
                 ProcessStartChatBotServer();
             }
-            else if (option.StartServer != null)
+            else if (option.StartServer)
             {
-                ProcessStartServer(option.StartServer);
+                ProcessStartServer();
             }
             else if (option.Error)
             {
@@ -447,9 +455,13 @@ namespace com_crawler.Console
             }
         }
 
-        static void ProcessStartServer(string[] args)
+        static void ProcessStartServer()
         {
-            Server.Server.Instance.StartServer(Convert.ToInt32(args[0]));
+            Server.Server.Instance.StartServer(Settings.Instance.Model.ServerSettings.WebServerPort);
+            ChatBot.BotManager.Instance.StartBots();
+
+            if (Settings.Instance.Model.ServerSettings.EnableMailServer)
+                Server.MailServer.Instance.StartServer();
 
             while (true)
             {

@@ -40,8 +40,6 @@ namespace com_crawler.Server
                     .WithController<ServerAPI>())
                 .WithModule(new ActionModule("/", HttpVerbs.Any, ctx => ctx.SendStringAsync("Community Crawler API Server", "text/html", Encoding.UTF8)));
 
-            server.StateChanged += (s, e) => $"WebServer New State - {e.NewState}".Info();
-
             return server;
         }
     }
