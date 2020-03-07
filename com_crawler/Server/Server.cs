@@ -10,6 +10,8 @@ using Swan.Logging;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
@@ -51,6 +53,24 @@ namespace com_crawler.Server
         {
             var dd = HttpContext.GetRequestBodyAsStringAsync().Result;
             HttpContext.SendStringAsync("Test data! " + dd, "text", Encoding.UTF8);
+        }
+
+        [Route(HttpVerbs.Get, "/mail")]
+        public void GetMailList()
+        {
+            var dd = HttpContext.GetRequestBodyAsStringAsync().Result;
+            if (string.IsNullOrEmpty(dd.Trim()))
+            {
+                var mailbox_path = Path.Combine(AppProvider.ApplicationPath, "mailbox");
+
+                if (Directory.Exists(mailbox_path))
+                {
+                    var items = MailServer.DataBase.QueryAll();
+                    HttpContext.SendStringAsync(string.Join("</br>", items.Select(x => $"From='{x.From}', To='{x.To}', Subject='{x.Title}', When='{new DateTime(Convert.ToInt64(x.DateTime), DateTimeKind.Utc)}'")), "text/html", Encoding.UTF8);
+                }
+                else
+                    HttpContext.SendStringAsync("Empty", "text", Encoding.UTF8);
+            }
         }
     }
 

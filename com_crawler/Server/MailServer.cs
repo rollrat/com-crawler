@@ -1,6 +1,7 @@
 ﻿// This source code is a part of Community Crawler Project.
 // Copyright (C) 2020. rollrat. Licensed under the MIT Licence.
 
+using com_crawler.DataBase;
 using com_crawler.Utils;
 using SmtpServer;
 using SmtpServer.Authentication;
@@ -16,8 +17,24 @@ using System.Threading.Tasks;
 
 namespace com_crawler.Server
 {
+    public class MailColumnModel : SQLiteColumnModel
+    {
+        public string Title { get; set; }
+        public string DateTime { get; set; }
+        public string From { get; set; }
+        public string To { get; set; }
+        public string FileName { get; set; }
+    }
+
     public class MailServer : ILazy<MailServer>
     {
+        public static SQLiteWrapper<MailColumnModel> DataBase;
+
+        public MailServer()
+        {
+            DataBase = new SQLiteWrapper<MailColumnModel>(Path.Combine(AppProvider.ApplicationPath, "mailserver.db"));
+        }
+
         public async void StartServer()
         {
             var options = new SmtpServerOptionsBuilder()
@@ -40,10 +57,23 @@ namespace com_crawler.Server
 
                 var message = MimeKit.MimeMessage.Load(textMessage.Content);
 
-                var save_path = Path.Combine(AppProvider.ApplicationPath, "mailbox", $"{DateTime.Now}-{message.Subject.ToBase64()}.mime");
+                Log.Logs.Instance.Push($"[Mail Server] Mail received. from='{message.From}', to='{message.To}', title='{message.Subject}'");
+
+                var mailbox_path = Path.Combine(AppProvider.ApplicationPath, "mailbox");
+                if (!Directory.Exists(mailbox_path))
+                    Directory.CreateDirectory(mailbox_path);
+
+                var save_path = Path.Combine(mailbox_path, $"{DateTime.Now.Ticks}-{message.Subject.ToBase64()}.mime");
                 File.WriteAllText(save_path, message.ToString());
 
-                Log.Logs.Instance.Push($"[Mail Server] Mail received. from='{message.From}', to='{message.To}', title='{message.Subject}'");
+                DataBase.Add(new MailColumnModel
+                {
+                    Title = message.Subject,
+                    DateTime = message.Date.UtcDateTime.Ticks.ToString(),
+                    From = message.From.ToString(),
+                    To = message.To.ToString(),
+                    FileName = save_path,
+                });
 
                 return Task.FromResult(SmtpResponse.Ok);
             }
