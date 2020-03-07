@@ -3,27 +3,27 @@
 ```
 Community Crawler 2020.3.1
 Build Date: Saturday, February 29, 2020
-                                           ^^                           
-      ^^      ..                                       ..               
-              []                                       []               
-            .:[]:_          ^^                       ,:[]:.             
-          .: :[]: :-.                             ,-: :[]: :.           
-        .: : :[]: : :`._                       ,.': : :[]: : :.         
-      .: : : :[]: : : : :-._               _,-: : : : :[]: : : :.       
-  _..: : : : :[]: : : : : : :-._________.-: : : : : : :[]: : : : :-._   
-  _:_:_:_:_:_:[]:_:_:_:_:_:_:_:_:_:_:_:_:_:_:_:_:_:_:_:[]:_:_:_:_:_:_   
-  !!!!!!!!!!!![]!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!![]!!!!!!!!!!!!!  
-  ^^^^^^^^^^^^[]^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[]^^^^^^^^^^^^^  
-              []                                       []               
-              []                                       []               
-              []                                       []               
-   ~~^-~^_~^~/  \~^-~^~_~^-~_^~-^~_^~~-^~_~^~-~_~-^~_^/  \~^-~_~^-~~-   
-  ~ _~~- ~^-^~-^~~- ^~_^-^~~_ -~^_ -~_-~~^- _~~_~-^_ ~^-^~~-_^-~ ~^     
-     ~ ^- _~~_-  ~~ _ ~  ^~  - ~~^ _ -  ^~-  ~ _  ~~^  - ~_   - ~^_~    
-       ~-  ^_  ~^ -  ^~ _ - ~^~ _   _~^~-  _ ~~^ - _ ~ - _ ~~^ -        
-          ~^ -_ ~^^ -_ ~ _ - _ ~^~-  _~ -_   ~- _ ~^ _ -  ~ ^-          
-              ~^~ - _ ^ - ~~~ _ - _ ~-^ ~ __- ~_ - ~  ~^_-              
-                  ~ ~- ^~ -  ~^ -  ~ ^~ - ~~  ^~ - ~                    
+                                           ^^
+      ^^      ..                                       ..
+              []                                       []
+            .:[]:_          ^^                       ,:[]:.
+          .: :[]: :-.                             ,-: :[]: :.
+        .: : :[]: : :`._                       ,.': : :[]: : :.
+      .: : : :[]: : : : :-._               _,-: : : : :[]: : : :.
+  _..: : : : :[]: : : : : : :-._________.-: : : : : : :[]: : : : :-._
+  _:_:_:_:_:_:[]:_:_:_:_:_:_:_:_:_:_:_:_:_:_:_:_:_:_:_:[]:_:_:_:_:_:_
+  !!!!!!!!!!!![]!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!![]!!!!!!!!!!!!!
+  ^^^^^^^^^^^^[]^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[]^^^^^^^^^^^^^
+              []                                       []
+              []                                       []
+              []                                       []
+   ~~^-~^_~^~/  \~^-~^~_~^-~_^~-^~_^~~-^~_~^~-~_~-^~_^/  \~^-~_~^-~~-
+  ~ _~~- ~^-^~-^~~- ^~_^-^~~_ -~^_ -~_-~~^- _~~_~-^_ ~^-^~~-_^-~ ~^
+     ~ ^- _~~_-  ~~ _ ~  ^~  - ~~^ _ -  ^~-  ~ _  ~~^  - ~_   - ~^_~
+       ~-  ^_  ~^ -  ^~ _ - ~^~ _   _~^~-  _ ~~^ - _ ~ - _ ~~^ -
+          ~^ -_ ~^^ -_ ~ _ - _ ~^~-  _~ -_   ~- _ ~^ _ -  ~ ^-
+              ~^~ - _ ^ - ~~~ _ - _ ~-^ ~ __- ~_ - ~  ~^_-
+                  ~ ~- ^~ -  ~^ -  ~ ^~ - ~~  ^~ - ~
 
 Copyright (C) 2020. Commnunity Crawler Developer
 E-Mail: rollrat.cse@gmail.com
@@ -46,12 +46,12 @@ We are looking for a very stable and scalable design based on Rust.
 
 ### ChatBot
 
-Custom Crawler provides `KakaoTalk(Not now)`, `Discord(Not now)` and `Telegram` chatbot features 
+Custom Crawler provides `KakaoTalk(Not now)`, `Discord(Not now)` and `Telegram` chatbot features
 for program controlling and information provision.
 
 To use this feature you need to enable the `setting.json`.
 
-``` json
+```json
   "BotSettings": {
     "EnableTelegramBot": true,
     "TelegramBotAccessToken": "--- insert your access token here ---",
@@ -87,7 +87,7 @@ If you want to see the download process, add `-p` option.
 ./com_crawler.Console https://www.instagram.com/taylorswift/ -p
 ```
 
-If you want to format the download path, enter `--list-extractor` to see the supported options. 
+If you want to format the download path, enter `--list-extractor` to see the supported options.
 `%(file)s` and `%(ext)s` are provided by default.
 
 ```
@@ -116,8 +116,10 @@ Custom Crawler API Server Example: https://cc.rollrat.com/
 
 Server Test: https://cc.rollrat.com/api/test
 
+Server Mailing List: https://cc.rollrat.com/api/mail
+
 It is a function that can provide various functions of custom crawler in the form of server.
-You can use this feature to build an internal proxy server or to create 
+You can use this feature to build an internal proxy server or to create
 a bot that can gather information from outside.
 
 ```
