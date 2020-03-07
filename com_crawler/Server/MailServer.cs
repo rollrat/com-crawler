@@ -9,6 +9,7 @@ using SmtpServer.Protocol;
 using SmtpServer.Storage;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -38,6 +39,9 @@ namespace com_crawler.Server
                 var textMessage = (ITextMessage)transaction.Message;
 
                 var message = MimeKit.MimeMessage.Load(textMessage.Content);
+
+                var save_path = Path.Combine(AppProvider.ApplicationPath, "mailbox", $"{DateTime.Now}-{message.Subject.ToBase64()}.mime");
+                File.WriteAllText(save_path, message.ToString());
 
                 Log.Logs.Instance.Push($"[Mail Server] Mail received. from='{message.From}', to='{message.To}', title='{message.Subject}'");
 
