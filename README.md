@@ -122,8 +122,17 @@ It is a function that can provide various functions of custom crawler in the for
 You can use this feature to build an internal proxy server or to create
 a bot that can gather information from outside.
 
+```json
+  "ServerSettings": {
+    "WebServerPort": 7979,
+    "EnableMailServer": true,
+    "AuthMailUser": "support",
+    "AuthMailPassword": "*"
+  },
 ```
-./com_crawler.Console <Port-Number>
+
+```
+./com_crawler.Console --start-server
 ```
 
 ## Contribution
