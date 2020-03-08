@@ -66,7 +66,7 @@ namespace com_crawler.Server
                 if (Directory.Exists(mailbox_path))
                 {
                     var items = MailServer.DataBase.QueryAll();
-                    HttpContext.SendStringAsync(string.Join("</br>", items.Select(x => $"From='{x.From}', To='{x.To}', Subject='{x.Title}', When='{new DateTime(Convert.ToInt64(x.DateTime), DateTimeKind.Utc)}'")), "text/html", Encoding.UTF8);
+                    HttpContext.SendStringAsync(string.Join("</br>", items.Select(x => $"From='{x.From}', To='{x.To}', Subject='{x.Title}', When='{new DateTime(Convert.ToInt64(x.DateTime), DateTimeKind.Utc)}', MailBox='{x.FileName}'")), "text/html", Encoding.UTF8);
                 }
                 else
                     HttpContext.SendStringAsync("Empty", "text", Encoding.UTF8);

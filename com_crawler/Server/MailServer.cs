@@ -1,6 +1,7 @@
 ﻿// This source code is a part of Community Crawler Project.
 // Copyright (C) 2020. rollrat. Licensed under the MIT Licence.
 
+using com_crawler.Crypto;
 using com_crawler.DataBase;
 using com_crawler.Utils;
 using SmtpServer;
@@ -63,7 +64,7 @@ namespace com_crawler.Server
                 if (!Directory.Exists(mailbox_path))
                     Directory.CreateDirectory(mailbox_path);
 
-                var save_path = Path.Combine(mailbox_path, $"{DateTime.Now.Ticks}-{message.Subject.ToBase64()}.mime");
+                var save_path = Path.Combine(mailbox_path, $"{DateTime.Now.Ticks}-{message.Subject.GetHashMD5()}.mime");
                 File.WriteAllText(save_path, message.ToString());
 
                 DataBase.Add(new MailColumnModel
