@@ -64,7 +64,7 @@ namespace com_crawler.Server
                 if (!Directory.Exists(mailbox_path))
                     Directory.CreateDirectory(mailbox_path);
 
-                var save_path = Path.Combine(mailbox_path, $"{DateTime.Now.Ticks}-{message.Subject.GetHashMD5()}.mime");
+                var save_path = Path.Combine(mailbox_path, $"{DateTime.Now.Ticks}-{(message.Subject + Crypto.Random.RandomString(15)).GetHashMD5()}.mime");
                 File.WriteAllText(save_path, message.ToString());
 
                 DataBase.Add(new MailColumnModel
